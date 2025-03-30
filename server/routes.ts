@@ -5,7 +5,9 @@ import {
   insertTaskSchema, 
   insertVendorSchema, 
   insertBudgetSchema, 
-  insertExpenseSchema 
+  insertExpenseSchema,
+  insertPackingListSchema,
+  insertPackingItemSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -278,6 +280,191 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Expense deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete expense" });
+    }
+  });
+  
+  // BULK TASK CREATION
+  apiRouter.post("/tasks/bulk", async (req: Request, res: Response) => {
+    try {
+      const tasksArray = z.array(insertTaskSchema).parse(req.body.tasks);
+      const newTasks = await storage.createTasks(tasksArray);
+      res.status(201).json(newTasks);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid tasks data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create tasks" });
+    }
+  });
+  
+  // PACKING LIST ROUTES
+  // Get all packing lists
+  apiRouter.get("/packing-lists", async (_req: Request, res: Response) => {
+    try {
+      const lists = await storage.getPackingLists();
+      res.json(lists);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch packing lists" });
+    }
+  });
+  
+  // Get a single packing list
+  apiRouter.get("/packing-lists/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const list = await storage.getPackingList(id);
+      
+      if (!list) {
+        return res.status(404).json({ message: "Packing list not found" });
+      }
+      
+      res.json(list);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch packing list" });
+    }
+  });
+  
+  // Create a packing list
+  apiRouter.post("/packing-lists", async (req: Request, res: Response) => {
+    try {
+      const listData = insertPackingListSchema.parse(req.body);
+      const newList = await storage.createPackingList(listData);
+      res.status(201).json(newList);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid packing list data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create packing list" });
+    }
+  });
+  
+  // Update a packing list
+  apiRouter.patch("/packing-lists/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const listData = insertPackingListSchema.partial().parse(req.body);
+      
+      const updatedList = await storage.updatePackingList(id, listData);
+      
+      if (!updatedList) {
+        return res.status(404).json({ message: "Packing list not found" });
+      }
+      
+      res.json(updatedList);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid packing list data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update packing list" });
+    }
+  });
+  
+  // Delete a packing list
+  apiRouter.delete("/packing-lists/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deletePackingList(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Packing list not found" });
+      }
+      
+      res.json({ message: "Packing list deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete packing list" });
+    }
+  });
+  
+  // PACKING ITEM ROUTES
+  // Get all packing items for a list
+  apiRouter.get("/packing-lists/:listId/items", async (req: Request, res: Response) => {
+    try {
+      const listId = parseInt(req.params.listId);
+      const items = await storage.getPackingItems(listId);
+      res.json(items);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch packing items" });
+    }
+  });
+  
+  // Get a single packing item
+  apiRouter.get("/packing-items/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const item = await storage.getPackingItem(id);
+      
+      if (!item) {
+        return res.status(404).json({ message: "Packing item not found" });
+      }
+      
+      res.json(item);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch packing item" });
+    }
+  });
+  
+  // Create a packing item
+  apiRouter.post("/packing-items", async (req: Request, res: Response) => {
+    try {
+      const itemData = insertPackingItemSchema.parse(req.body);
+      const newItem = await storage.createPackingItem(itemData);
+      res.status(201).json(newItem);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid packing item data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create packing item" });
+    }
+  });
+  
+  // Bulk create packing items
+  apiRouter.post("/packing-items/bulk", async (req: Request, res: Response) => {
+    try {
+      const itemsArray = z.array(insertPackingItemSchema).parse(req.body.items);
+      const newItems = await storage.createPackingItems(itemsArray);
+      res.status(201).json(newItems);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid packing items data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create packing items" });
+    }
+  });
+  
+  // Update a packing item
+  apiRouter.patch("/packing-items/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const itemData = insertPackingItemSchema.partial().parse(req.body);
+      
+      const updatedItem = await storage.updatePackingItem(id, itemData);
+      
+      if (!updatedItem) {
+        return res.status(404).json({ message: "Packing item not found" });
+      }
+      
+      res.json(updatedItem);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid packing item data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update packing item" });
+    }
+  });
+  
+  // Delete a packing item
+  apiRouter.delete("/packing-items/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deletePackingItem(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Packing item not found" });
+      }
+      
+      res.json({ message: "Packing item deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete packing item" });
     }
   });
 

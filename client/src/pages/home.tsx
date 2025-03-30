@@ -4,13 +4,14 @@ import TaskList from "@/components/tasks/task-list";
 import VendorList from "@/components/vendors/vendor-list";
 import BudgetDetail from "@/components/budget/budget-detail";
 import ExpenseList from "@/components/budget/expense-list";
+import PackingList from "@/components/lists/packing-list";
 import AddTaskModal from "@/components/tasks/add-task-modal";
 import AddVendorModal from "@/components/vendors/add-vendor-modal";
 import SetBudgetModal from "@/components/budget/set-budget-modal";
 import AddExpenseModal from "@/components/budget/add-expense-modal";
 import { useQuery } from "@tanstack/react-query";
 
-type Tab = "tasks" | "vendors" | "budget";
+type Tab = "tasks" | "vendors" | "budget" | "lists";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("tasks");
@@ -84,6 +85,16 @@ export default function Home() {
               >
                 Budget
               </button>
+              <button
+                className={`px-1 py-4 text-sm font-medium border-b-2 ${
+                  activeTab === "lists"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                }`}
+                onClick={() => setActiveTab("lists")}
+              >
+                Lists
+              </button>
             </nav>
           </div>
         </div>
@@ -153,6 +164,12 @@ export default function Home() {
             <ExpenseList />
             <SetBudgetModal isOpen={isSetBudgetModalOpen} onClose={() => setIsSetBudgetModalOpen(false)} />
             <AddExpenseModal isOpen={isAddExpenseModalOpen} onClose={() => setIsAddExpenseModalOpen(false)} />
+          </div>
+        )}
+        
+        {activeTab === "lists" && (
+          <div>
+            <PackingList />
           </div>
         )}
       </main>

@@ -3,7 +3,9 @@ import {
   tasks, type Task, type InsertTask,
   vendors, type Vendor, type InsertVendor,
   budgets, type Budget, type InsertBudget,
-  expenses, type Expense, type InsertExpense
+  expenses, type Expense, type InsertExpense,
+  packingLists, type PackingList, type InsertPackingList,
+  packingItems, type PackingItem, type InsertPackingItem
 } from "@shared/schema";
 
 export interface IStorage {
@@ -16,8 +18,24 @@ export interface IStorage {
   getTasks(): Promise<Task[]>;
   getTask(id: number): Promise<Task | undefined>;
   createTask(task: InsertTask): Promise<Task>;
+  createTasks(tasks: InsertTask[]): Promise<Task[]>; // Bulk task creation
   updateTask(id: number, task: Partial<InsertTask>): Promise<Task | undefined>;
   deleteTask(id: number): Promise<boolean>;
+  
+  // Packing List methods
+  getPackingLists(): Promise<PackingList[]>;
+  getPackingList(id: number): Promise<PackingList | undefined>;
+  createPackingList(list: InsertPackingList): Promise<PackingList>;
+  updatePackingList(id: number, list: Partial<InsertPackingList>): Promise<PackingList | undefined>;
+  deletePackingList(id: number): Promise<boolean>;
+  
+  // Packing Items methods
+  getPackingItems(listId: number): Promise<PackingItem[]>;
+  getPackingItem(id: number): Promise<PackingItem | undefined>;
+  createPackingItem(item: InsertPackingItem): Promise<PackingItem>;
+  createPackingItems(items: InsertPackingItem[]): Promise<PackingItem[]>; // Bulk items creation
+  updatePackingItem(id: number, item: Partial<InsertPackingItem>): Promise<PackingItem | undefined>;
+  deletePackingItem(id: number): Promise<boolean>;
   
   // Vendor methods
   getVendors(): Promise<Vendor[]>;
@@ -45,12 +63,16 @@ export class MemStorage implements IStorage {
   private vendors: Map<number, Vendor>;
   private budgets: Map<number, Budget>;
   private expenses: Map<number, Expense>;
+  private packingLists: Map<number, PackingList>;
+  private packingItems: Map<number, PackingItem>;
   
   currentUserId: number;
   currentTaskId: number;
   currentVendorId: number;
   currentBudgetId: number;
   currentExpenseId: number;
+  currentPackingListId: number;
+  currentPackingItemId: number;
 
   constructor() {
     this.users = new Map();
@@ -58,12 +80,16 @@ export class MemStorage implements IStorage {
     this.vendors = new Map();
     this.budgets = new Map();
     this.expenses = new Map();
+    this.packingLists = new Map();
+    this.packingItems = new Map();
     
     this.currentUserId = 1;
     this.currentTaskId = 1;
     this.currentVendorId = 1;
     this.currentBudgetId = 1;
     this.currentExpenseId = 1;
+    this.currentPackingListId = 1;
+    this.currentPackingItemId = 1;
     
     // Initialize with default budget
     this.setBudget({ amount: 20000 });
@@ -152,6 +178,69 @@ export class MemStorage implements IStorage {
       item: "Transportation",
       vendor: "Luxury Limos",
       amount: 500
+    });
+    
+    // Sample packing lists - using direct Map operations to avoid Promise issues
+    const honeymoonListId = this.currentPackingListId++;
+    const honeymoonList: PackingList = { 
+      id: honeymoonListId,
+      activity: "Honeymoon Trip",
+      description: "Items to pack for our beach honeymoon"
+    };
+    this.packingLists.set(honeymoonListId, honeymoonList);
+    
+    const ceremonyListId = this.currentPackingListId++;
+    const ceremonyList: PackingList = { 
+      id: ceremonyListId,
+      activity: "Wedding Ceremony",
+      description: "Essential items for the wedding day"
+    };
+    this.packingLists.set(ceremonyListId, ceremonyList);
+    
+    // Sample packing items - using direct Map operations
+    const swimsuitId = this.currentPackingItemId++;
+    this.packingItems.set(swimsuitId, {
+      id: swimsuitId,
+      listId: honeymoonList.id,
+      item: "Swimsuit",
+      quantity: 2,
+      packed: false
+    });
+    
+    const sunscreenId = this.currentPackingItemId++;
+    this.packingItems.set(sunscreenId, {
+      id: sunscreenId,
+      listId: honeymoonList.id,
+      item: "Sunscreen",
+      quantity: 1,
+      packed: false
+    });
+    
+    const passportId = this.currentPackingItemId++;
+    this.packingItems.set(passportId, {
+      id: passportId,
+      listId: honeymoonList.id,
+      item: "Passport",
+      quantity: 2,
+      packed: false
+    });
+    
+    const ringsId = this.currentPackingItemId++;
+    this.packingItems.set(ringsId, {
+      id: ringsId,
+      listId: ceremonyList.id,
+      item: "Wedding rings",
+      quantity: 2,
+      packed: false
+    });
+    
+    const vowsId = this.currentPackingItemId++;
+    this.packingItems.set(vowsId, {
+      id: vowsId,
+      listId: ceremonyList.id,
+      item: "Vows",
+      quantity: 2,
+      packed: false
     });
   }
 
@@ -283,6 +372,90 @@ export class MemStorage implements IStorage {
   
   async deleteExpense(id: number): Promise<boolean> {
     return this.expenses.delete(id);
+  }
+  
+  // Bulk task creation
+  async createTasks(tasks: InsertTask[]): Promise<Task[]> {
+    const createdTasks: Task[] = [];
+    for (const taskData of tasks) {
+      const task = await this.createTask(taskData);
+      createdTasks.push(task);
+    }
+    return createdTasks;
+  }
+  
+  // Packing List methods
+  async getPackingLists(): Promise<PackingList[]> {
+    return Array.from(this.packingLists.values());
+  }
+  
+  async getPackingList(id: number): Promise<PackingList | undefined> {
+    return this.packingLists.get(id);
+  }
+  
+  async createPackingList(insertList: InsertPackingList): Promise<PackingList> {
+    const id = this.currentPackingListId++;
+    const list: PackingList = { ...insertList, id };
+    this.packingLists.set(id, list);
+    return list;
+  }
+  
+  async updatePackingList(id: number, list: Partial<InsertPackingList>): Promise<PackingList | undefined> {
+    const existingList = this.packingLists.get(id);
+    if (!existingList) return undefined;
+    
+    const updatedList: PackingList = { ...existingList, ...list };
+    this.packingLists.set(id, updatedList);
+    return updatedList;
+  }
+  
+  async deletePackingList(id: number): Promise<boolean> {
+    // Also delete all items associated with this list
+    const itemsToDelete = Array.from(this.packingItems.values())
+      .filter(item => item.listId === id)
+      .map(item => item.id);
+    
+    itemsToDelete.forEach(itemId => this.packingItems.delete(itemId));
+    return this.packingLists.delete(id);
+  }
+  
+  // Packing Items methods
+  async getPackingItems(listId: number): Promise<PackingItem[]> {
+    return Array.from(this.packingItems.values())
+      .filter(item => item.listId === listId);
+  }
+  
+  async getPackingItem(id: number): Promise<PackingItem | undefined> {
+    return this.packingItems.get(id);
+  }
+  
+  async createPackingItem(insertItem: InsertPackingItem): Promise<PackingItem> {
+    const id = this.currentPackingItemId++;
+    const item: PackingItem = { ...insertItem, id };
+    this.packingItems.set(id, item);
+    return item;
+  }
+  
+  async createPackingItems(items: InsertPackingItem[]): Promise<PackingItem[]> {
+    const createdItems: PackingItem[] = [];
+    for (const itemData of items) {
+      const item = await this.createPackingItem(itemData);
+      createdItems.push(item);
+    }
+    return createdItems;
+  }
+  
+  async updatePackingItem(id: number, item: Partial<InsertPackingItem>): Promise<PackingItem | undefined> {
+    const existingItem = this.packingItems.get(id);
+    if (!existingItem) return undefined;
+    
+    const updatedItem: PackingItem = { ...existingItem, ...item };
+    this.packingItems.set(id, updatedItem);
+    return updatedItem;
+  }
+  
+  async deletePackingItem(id: number): Promise<boolean> {
+    return this.packingItems.delete(id);
   }
 }
 
