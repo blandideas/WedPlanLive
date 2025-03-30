@@ -53,7 +53,7 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
   const isEditing = !!expense;
   
   // Fetch vendors for the dropdown
-  const { data: vendors = [] } = useQuery({
+  const { data: vendors = [] } = useQuery<any[]>({
     queryKey: ['/api/vendors'],
   });
   
@@ -62,7 +62,7 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
     defaultValues: {
       category: expense?.category || "",
       item: expense?.item || "",
-      vendor: expense?.vendor || "",
+      vendor: expense?.vendor || "none",
       amount: expense?.amount?.toString() || "",
     },
   });
@@ -72,14 +72,14 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
       form.reset({
         category: expense.category,
         item: expense.item,
-        vendor: expense.vendor || "",
+        vendor: expense.vendor || "none",
         amount: expense.amount.toString(),
       });
     } else {
       form.reset({
         category: "",
         item: "",
-        vendor: "",
+        vendor: "none",
         amount: "",
       });
     }
@@ -90,6 +90,7 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       const response = await apiRequest('POST', '/api/expenses', {
         ...data,
+        vendor: data.vendor === 'none' ? null : data.vendor,
         amount: Number(data.amount),
       });
       return response.json();
@@ -114,6 +115,7 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       const response = await apiRequest('PATCH', `/api/expenses/${expense.id}`, {
         ...data,
+        vendor: data.vendor === 'none' ? null : data.vendor,
         amount: Number(data.amount),
       });
       return response.json();
@@ -213,7 +215,7 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
-                      <SelectItem value="">None</SelectItem>
+                      <SelectItem value="none">None</SelectItem>
                       {vendors.map((vendor: any) => (
                         <SelectItem key={vendor.id} value={vendor.name}>
                           {vendor.name}
@@ -234,7 +236,7 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
                   <FormLabel>Amount</FormLabel>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 sm:text-sm">$</span>
+                      <span className="text-gray-500 sm:text-sm">₵</span>
                     </div>
                     <FormControl>
                       <Input 
