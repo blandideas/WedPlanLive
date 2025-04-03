@@ -36,10 +36,10 @@ const formSchema = z.object({
   category: z.string().min(1, { message: "Category is required" }),
   item: z.string().min(1, { message: "Item description is required" }),
   vendor: z.string().optional(),
-  amount: z.string()
-    .min(1, { message: "Amount is required" })
-    .transform((val) => Number(val))
-    .refine((val) => !isNaN(val) && val >= 0, { message: "Amount must be a positive number" }),
+  amount: z.coerce
+    .number()
+    .min(0, { message: "Amount must be a positive number" })
+    .nonnegative({ message: "Amount cannot be negative" }),
 });
 
 interface AddExpenseModalProps {
@@ -63,7 +63,7 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
       category: expense?.category || "",
       item: expense?.item || "",
       vendor: expense?.vendor || "none",
-      amount: expense?.amount?.toString() || "",
+      amount: expense?.amount || 0,
     },
   });
   
@@ -73,14 +73,14 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
         category: expense.category,
         item: expense.item,
         vendor: expense.vendor || "none",
-        amount: expense.amount.toString(),
+        amount: expense.amount,
       });
     } else {
       form.reset({
         category: "",
         item: "",
         vendor: "none",
-        amount: "",
+        amount: 0,
       });
     }
   }, [expense, form]);
@@ -91,7 +91,6 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
       const response = await apiRequest('POST', '/api/expenses', {
         ...data,
         vendor: data.vendor === 'none' ? null : data.vendor,
-        amount: Number(data.amount),
       });
       return response.json();
     },
@@ -116,7 +115,6 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
       const response = await apiRequest('PATCH', `/api/expenses/${expense.id}`, {
         ...data,
         vendor: data.vendor === 'none' ? null : data.vendor,
-        amount: Number(data.amount),
       });
       return response.json();
     },
