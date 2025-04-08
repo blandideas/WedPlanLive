@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, doublePrecision, date } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -117,6 +117,32 @@ export const insertExpenseSchema = createInsertSchema(expenses).pick({
 
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
 export type Expense = typeof expenses.$inferSelect;
+
+// Payments schema
+export const payments = pgTable("payments", {
+  id: serial("id").primaryKey(),
+  vendorId: integer("vendor_id").notNull(),
+  amount: doublePrecision("amount").notNull(),
+  date: text("date").notNull(), // Using text since we're working with string dates
+  description: text("description").notNull().default(""),
+  isPaid: boolean("is_paid").notNull().default(false),
+});
+
+export const insertPaymentSchema = createInsertSchema(payments, {
+  isPaid: z.boolean(),
+}).pick({
+  vendorId: true,
+  amount: true,
+  date: true,
+  description: true,
+  isPaid: true,
+}).extend({
+  description: z.string().optional().transform(val => val || ""),
+  isPaid: z.boolean().optional().transform(val => val || false),
+});
+
+export type InsertPayment = z.infer<typeof insertPaymentSchema>;
+export type Payment = typeof payments.$inferSelect;
 
 // Original user schema (keeping this from the template)
 export const users = pgTable("users", {

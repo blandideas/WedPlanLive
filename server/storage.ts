@@ -5,7 +5,8 @@ import {
   budgets, type Budget, type InsertBudget,
   expenses, type Expense, type InsertExpense,
   packingLists, type PackingList, type InsertPackingList,
-  packingItems, type PackingItem, type InsertPackingItem
+  packingItems, type PackingItem, type InsertPackingItem,
+  payments, type Payment, type InsertPayment
 } from "@shared/schema";
 
 export interface IStorage {
@@ -55,6 +56,14 @@ export interface IStorage {
   createExpense(expense: InsertExpense): Promise<Expense>;
   updateExpense(id: number, expense: Partial<InsertExpense>): Promise<Expense | undefined>;
   deleteExpense(id: number): Promise<boolean>;
+  
+  // Payment methods
+  getPayments(): Promise<Payment[]>;
+  getPaymentsByVendor(vendorId: number): Promise<Payment[]>;
+  getPayment(id: number): Promise<Payment | undefined>;
+  createPayment(payment: InsertPayment): Promise<Payment>;
+  updatePayment(id: number, payment: Partial<InsertPayment>): Promise<Payment | undefined>;
+  deletePayment(id: number): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -65,6 +74,7 @@ export class MemStorage implements IStorage {
   private expenses: Map<number, Expense>;
   private packingLists: Map<number, PackingList>;
   private packingItems: Map<number, PackingItem>;
+  private payments: Map<number, Payment>;
   
   currentUserId: number;
   currentTaskId: number;
@@ -73,6 +83,7 @@ export class MemStorage implements IStorage {
   currentExpenseId: number;
   currentPackingListId: number;
   currentPackingItemId: number;
+  currentPaymentId: number;
 
   constructor() {
     this.users = new Map();
@@ -82,6 +93,7 @@ export class MemStorage implements IStorage {
     this.expenses = new Map();
     this.packingLists = new Map();
     this.packingItems = new Map();
+    this.payments = new Map();
     
     this.currentUserId = 1;
     this.currentTaskId = 1;
@@ -90,6 +102,7 @@ export class MemStorage implements IStorage {
     this.currentExpenseId = 1;
     this.currentPackingListId = 1;
     this.currentPackingItemId = 1;
+    this.currentPaymentId = 1;
     
     // Initialize with default budget
     this.setBudget({ amount: 20000 });
@@ -241,6 +254,37 @@ export class MemStorage implements IStorage {
       item: "Vows",
       quantity: 2,
       packed: false
+    });
+    
+    // Sample payments - using direct Map operations
+    const depositPaymentId = this.currentPaymentId++;
+    this.payments.set(depositPaymentId, {
+      id: depositPaymentId,
+      vendorId: 1, // Sunset Gardens
+      amount: 2000,
+      date: "2024-06-01",
+      description: "Initial deposit for venue",
+      isPaid: true
+    });
+    
+    const finalVenuePaymentId = this.currentPaymentId++;
+    this.payments.set(finalVenuePaymentId, {
+      id: finalVenuePaymentId,
+      vendorId: 1, // Sunset Gardens
+      amount: 3000,
+      date: "2024-07-30",
+      description: "Final payment for venue",
+      isPaid: false
+    });
+    
+    const cakeDepositId = this.currentPaymentId++;
+    this.payments.set(cakeDepositId, {
+      id: cakeDepositId,
+      vendorId: 2, // Delicious Cakes
+      amount: 200,
+      date: "2024-08-15",
+      description: "Deposit for wedding cake",
+      isPaid: true
     });
   }
 
@@ -456,6 +500,40 @@ export class MemStorage implements IStorage {
   
   async deletePackingItem(id: number): Promise<boolean> {
     return this.packingItems.delete(id);
+  }
+
+  // Payment methods
+  async getPayments(): Promise<Payment[]> {
+    return Array.from(this.payments.values());
+  }
+
+  async getPaymentsByVendor(vendorId: number): Promise<Payment[]> {
+    return Array.from(this.payments.values())
+      .filter(payment => payment.vendorId === vendorId);
+  }
+
+  async getPayment(id: number): Promise<Payment | undefined> {
+    return this.payments.get(id);
+  }
+
+  async createPayment(insertPayment: InsertPayment): Promise<Payment> {
+    const id = this.currentPaymentId++;
+    const payment: Payment = { ...insertPayment, id };
+    this.payments.set(id, payment);
+    return payment;
+  }
+
+  async updatePayment(id: number, payment: Partial<InsertPayment>): Promise<Payment | undefined> {
+    const existingPayment = this.payments.get(id);
+    if (!existingPayment) return undefined;
+    
+    const updatedPayment: Payment = { ...existingPayment, ...payment };
+    this.payments.set(id, updatedPayment);
+    return updatedPayment;
+  }
+
+  async deletePayment(id: number): Promise<boolean> {
+    return this.payments.delete(id);
   }
 }
 

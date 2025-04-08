@@ -7,7 +7,8 @@ import {
   insertBudgetSchema, 
   insertExpenseSchema,
   insertPackingListSchema,
-  insertPackingItemSchema
+  insertPackingItemSchema,
+  insertPaymentSchema
 } from "@shared/schema";
 import { z } from "zod";
 
@@ -465,6 +466,95 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json({ message: "Packing item deleted successfully" });
     } catch (error) {
       res.status(500).json({ message: "Failed to delete packing item" });
+    }
+  });
+
+  // PAYMENT ROUTES
+  // Get all payments
+  apiRouter.get("/payments", async (_req: Request, res: Response) => {
+    try {
+      const payments = await storage.getPayments();
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payments" });
+    }
+  });
+
+  // Get payments by vendor
+  apiRouter.get("/vendors/:vendorId/payments", async (req: Request, res: Response) => {
+    try {
+      const vendorId = parseInt(req.params.vendorId);
+      const payments = await storage.getPaymentsByVendor(vendorId);
+      res.json(payments);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payments for vendor" });
+    }
+  });
+
+  // Get a single payment
+  apiRouter.get("/payments/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const payment = await storage.getPayment(id);
+      
+      if (!payment) {
+        return res.status(404).json({ message: "Payment not found" });
+      }
+      
+      res.json(payment);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch payment" });
+    }
+  });
+
+  // Create a payment
+  apiRouter.post("/payments", async (req: Request, res: Response) => {
+    try {
+      const paymentData = insertPaymentSchema.parse(req.body);
+      const newPayment = await storage.createPayment(paymentData);
+      res.status(201).json(newPayment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid payment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to create payment" });
+    }
+  });
+
+  // Update a payment
+  apiRouter.patch("/payments/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const paymentData = insertPaymentSchema.partial().parse(req.body);
+      
+      const updatedPayment = await storage.updatePayment(id, paymentData);
+      
+      if (!updatedPayment) {
+        return res.status(404).json({ message: "Payment not found" });
+      }
+      
+      res.json(updatedPayment);
+    } catch (error) {
+      if (error instanceof z.ZodError) {
+        return res.status(400).json({ message: "Invalid payment data", errors: error.errors });
+      }
+      res.status(500).json({ message: "Failed to update payment" });
+    }
+  });
+
+  // Delete a payment
+  apiRouter.delete("/payments/:id", async (req: Request, res: Response) => {
+    try {
+      const id = parseInt(req.params.id);
+      const success = await storage.deletePayment(id);
+      
+      if (!success) {
+        return res.status(404).json({ message: "Payment not found" });
+      }
+      
+      res.json({ message: "Payment deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Failed to delete payment" });
     }
   });
 

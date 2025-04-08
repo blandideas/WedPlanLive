@@ -5,12 +5,13 @@ import VendorList from "@/components/vendors/vendor-list";
 import BudgetDetail from "@/components/budget/budget-detail";
 import ExpenseList from "@/components/budget/expense-list";
 import PackingList from "@/components/lists/packing-list";
+import PaymentList from "@/components/payment/payment-list";
 import AddVendorModal from "@/components/vendors/add-vendor-modal";
 import SetBudgetModal from "@/components/budget/set-budget-modal";
 import AddExpenseModal from "@/components/budget/add-expense-modal";
 import { useQuery } from "@tanstack/react-query";
 
-type Tab = "tasks" | "vendors" | "budget" | "lists";
+type Tab = "tasks" | "vendors" | "budget" | "lists" | "payments";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("tasks");
@@ -85,6 +86,16 @@ export default function Home() {
               </button>
               <button
                 className={`px-1 py-4 text-sm font-medium border-b-2 ${
+                  activeTab === "payments"
+                    ? "border-primary text-primary"
+                    : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
+                }`}
+                onClick={() => setActiveTab("payments")}
+              >
+                Payments
+              </button>
+              <button
+                className={`px-1 py-4 text-sm font-medium border-b-2 ${
                   activeTab === "lists"
                     ? "border-primary text-primary"
                     : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700"
@@ -155,6 +166,12 @@ export default function Home() {
         {activeTab === "lists" && (
           <div>
             <PackingList />
+          </div>
+        )}
+        
+        {activeTab === "payments" && (
+          <div>
+            <PaymentList />
           </div>
         )}
       </main>
