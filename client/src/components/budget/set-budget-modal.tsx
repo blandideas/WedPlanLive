@@ -40,15 +40,21 @@ interface SetBudgetModalProps {
 export default function SetBudgetModal({ isOpen, onClose }: SetBudgetModalProps) {
   const { toast } = useToast();
   
+  // Define budget type
+  interface Budget {
+    id: number;
+    amount: number;
+  }
+  
   // Fetch current budget
-  const { data: budget } = useQuery({
+  const { data: budget } = useQuery<Budget>({
     queryKey: ['/api/budget'],
   });
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      amount: budget?.amount?.toString() || "0",
+      amount: budget?.amount ? budget.amount.toString() : "0",
     },
   });
   
