@@ -3,6 +3,8 @@ import { useQuery, useMutation } from "@tanstack/react-query";
 import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Plus, ListPlus } from "lucide-react";
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -15,6 +17,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import AddPackingItemModal from "./add-packing-item-modal";
+import AddBulkPackingItemsModal from "./add-bulk-packing-items-modal";
 
 interface PackingItemListProps {
   listId: number;
@@ -24,6 +27,8 @@ export default function PackingItemList({ listId }: PackingItemListProps) {
   const { toast } = useToast();
   const [editingItem, setEditingItem] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isBulkAddModalOpen, setIsBulkAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
@@ -96,6 +101,27 @@ export default function PackingItemList({ listId }: PackingItemListProps) {
   
   return (
     <>
+      {/* Action Buttons */}
+      <div className="flex justify-end mb-4 space-x-3">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setIsBulkAddModalOpen(true)}
+          className="flex items-center"
+        >
+          <ListPlus className="h-4 w-4 mr-1" />
+          Add Multiple Items
+        </Button>
+        <Button
+          size="sm"
+          onClick={() => setIsAddModalOpen(true)}
+          className="flex items-center"
+        >
+          <Plus className="h-4 w-4 mr-1" />
+          Add Item
+        </Button>
+      </div>
+    
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">Loading items...</div>
@@ -182,6 +208,20 @@ export default function PackingItemList({ listId }: PackingItemListProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Add Item Modal */}
+      <AddPackingItemModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+        listId={listId}
+      />
+
+      {/* Add Bulk Items Modal */}
+      <AddBulkPackingItemsModal
+        isOpen={isBulkAddModalOpen}
+        onClose={() => setIsBulkAddModalOpen(false)}
+        listId={listId}
+      />
     </>
   );
 }
