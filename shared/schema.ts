@@ -25,7 +25,7 @@ export type Task = typeof tasks.$inferSelect;
 export const packingLists = pgTable("packing_lists", {
   id: serial("id").primaryKey(),
   activity: text("activity").notNull(),
-  description: text("description").notNull().default(""),
+  description: text("description"),
 });
 
 export const insertPackingListSchema = createInsertSchema(packingLists).pick({
@@ -65,9 +65,9 @@ export const vendors = pgTable("vendors", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   category: text("category").notNull(),
-  contact: text("contact").notNull().default(""),
-  phone: text("phone").notNull().default(""),
-  email: text("email").notNull().default(""),
+  contact: text("contact"),
+  phone: text("phone"),
+  email: text("email"),
 });
 
 export const insertVendorSchema = createInsertSchema(vendors).pick({
@@ -102,7 +102,7 @@ export const expenses = pgTable("expenses", {
   id: serial("id").primaryKey(),
   category: text("category").notNull(),
   item: text("item").notNull(),
-  vendor: text("vendor").notNull().default(""),
+  vendor: text("vendor"),
   amount: doublePrecision("amount").notNull(),
 });
 

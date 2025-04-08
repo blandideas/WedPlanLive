@@ -46,7 +46,7 @@ interface Payment {
 interface AddPaymentModalProps {
   isOpen: boolean;
   onClose: () => void;
-  payment?: Payment | null;
+  payment: Payment | null;
   vendors: Vendor[];
 }
 
@@ -179,7 +179,6 @@ export default function AddPaymentModal({
             {isEditing ? "Edit Payment" : "Add New Payment"}
           </DialogTitle>
         </DialogHeader>
-
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Vendor Selection */}
@@ -201,7 +200,7 @@ export default function AddPaymentModal({
                     <SelectContent>
                       {vendors.map((vendor) => (
                         <SelectItem key={vendor.id} value={vendor.id.toString()}>
-                          {vendor.name} ({vendor.category})
+                          {vendor.name}
                         </SelectItem>
                       ))}
                     </SelectContent>
@@ -224,7 +223,7 @@ export default function AddPaymentModal({
                       step="0.01"
                       placeholder="0.00"
                       {...field}
-                      onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                      onChange={(e) => field.onChange(parseFloat(e.target.value))}
                     />
                   </FormControl>
                   <FormMessage />
