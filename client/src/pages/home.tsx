@@ -5,7 +5,6 @@ import VendorList from "@/components/vendors/vendor-list";
 import BudgetDetail from "@/components/budget/budget-detail";
 import ExpenseList from "@/components/budget/expense-list";
 import PackingList from "@/components/lists/packing-list";
-import AddTaskModal from "@/components/tasks/add-task-modal";
 import AddVendorModal from "@/components/vendors/add-vendor-modal";
 import SetBudgetModal from "@/components/budget/set-budget-modal";
 import AddExpenseModal from "@/components/budget/add-expense-modal";
@@ -15,23 +14,22 @@ type Tab = "tasks" | "vendors" | "budget" | "lists";
 
 export default function Home() {
   const [activeTab, setActiveTab] = useState<Tab>("tasks");
-  const [isAddTaskModalOpen, setIsAddTaskModalOpen] = useState(false);
   const [isAddVendorModalOpen, setIsAddVendorModalOpen] = useState(false);
   const [isSetBudgetModalOpen, setIsSetBudgetModalOpen] = useState(false);
   const [isAddExpenseModalOpen, setIsAddExpenseModalOpen] = useState(false);
   
   // Get budget
-  const { data: budget } = useQuery({
+  const { data: budget } = useQuery<any>({
     queryKey: ['/api/budget'],
   });
   
   // Get expenses
-  const { data: expenses } = useQuery({
+  const { data: expenses = [] } = useQuery<any[]>({
     queryKey: ['/api/expenses'],
   });
   
   // Get tasks
-  const { data: tasks } = useQuery({
+  const { data: tasks = [] } = useQuery<any[]>({
     queryKey: ['/api/tasks'],
   });
   
@@ -102,20 +100,7 @@ export default function Home() {
         {/* Tab Content */}
         {activeTab === "tasks" && (
           <div>
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-semibold">Wedding Tasks</h2>
-              <button
-                className="bg-primary hover:bg-primary/90 text-white px-3 py-2 rounded-md text-sm font-medium flex items-center"
-                onClick={() => setIsAddTaskModalOpen(true)}
-              >
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                </svg>
-                Add Task
-              </button>
-            </div>
             <TaskList />
-            <AddTaskModal isOpen={isAddTaskModalOpen} onClose={() => setIsAddTaskModalOpen(false)} />
           </div>
         )}
         
