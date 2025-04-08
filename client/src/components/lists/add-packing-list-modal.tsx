@@ -51,10 +51,16 @@ export default function AddPackingListModal({ isOpen, onClose, list }: AddPackin
   const addListMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
       if (isEditing) {
-        const response = await apiRequest('PATCH', `/api/packing-lists/${list.id}`, data);
+        const response = await apiRequest(`/api/packing-lists/${list.id}`, {
+          method: 'PATCH',
+          data: data
+        });
         return response.json();
       } else {
-        const response = await apiRequest('POST', '/api/packing-lists', data);
+        const response = await apiRequest('/api/packing-lists', {
+          method: 'POST',
+          data: data
+        });
         return response.json();
       }
     },

@@ -28,18 +28,14 @@ export default function PackingList() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   // Fetch all packing lists
-  const { data: packingLists = [], isLoading } = useQuery({
+  const { data: packingLists = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/packing-lists'],
-    queryFn: async () => {
-      const res = await apiRequest('GET', '/api/packing-lists');
-      return res.json();
-    },
   });
   
   // Delete list mutation
   const deleteListMutation = useMutation({
     mutationFn: async (listId: number) => {
-      await apiRequest('DELETE', `/api/packing-lists/${listId}`);
+      await apiRequest(`/api/packing-lists/${listId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/packing-lists'] });

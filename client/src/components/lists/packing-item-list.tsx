@@ -33,10 +33,10 @@ export default function PackingItemList({ listId }: PackingItemListProps) {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   // Fetch packing items
-  const { data: items = [], isLoading } = useQuery({
+  const { data: items = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/packing-lists', listId, 'items'],
     queryFn: async () => {
-      const res = await apiRequest('GET', `/api/packing-lists/${listId}/items`);
+      const res = await apiRequest(`/api/packing-lists/${listId}/items`);
       return res.json();
     },
   });
@@ -44,7 +44,7 @@ export default function PackingItemList({ listId }: PackingItemListProps) {
   // Delete item mutation
   const deleteItemMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      await apiRequest('DELETE', `/api/packing-items/${itemId}`);
+      await apiRequest(`/api/packing-items/${itemId}`, { method: 'DELETE' });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/packing-lists', listId, 'items'] });
@@ -62,7 +62,10 @@ export default function PackingItemList({ listId }: PackingItemListProps) {
   // Update item mutation (for checkbox)
   const updateItemMutation = useMutation({
     mutationFn: async ({ id, packed }: { id: number, packed: boolean }) => {
-      const response = await apiRequest('PATCH', `/api/packing-items/${id}`, { packed });
+      const response = await apiRequest(`/api/packing-items/${id}`, {
+        method: 'PATCH',
+        data: { packed }
+      });
       return response.json();
     },
     onSuccess: () => {
