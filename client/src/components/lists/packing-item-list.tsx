@@ -44,10 +44,14 @@ export default function PackingItemList({ listId }: PackingItemListProps) {
   // Delete item mutation
   const deleteItemMutation = useMutation({
     mutationFn: async (itemId: number) => {
-      await apiRequest(`/api/packing-items/${itemId}`, { method: 'DELETE' });
+      return apiRequest(`/api/packing-items/${itemId}`, { 
+        method: 'DELETE' 
+      });
     },
     onSuccess: () => {
+      // Force refetch directly
       queryClient.invalidateQueries({ queryKey: ['/api/packing-lists', listId, 'items'] });
+      queryClient.refetchQueries({ queryKey: ['/api/packing-lists', listId, 'items'] });
       toast({ title: "Item deleted", description: "Item has been deleted successfully" });
     },
     onError: () => {
@@ -62,14 +66,15 @@ export default function PackingItemList({ listId }: PackingItemListProps) {
   // Update item mutation (for checkbox)
   const updateItemMutation = useMutation({
     mutationFn: async ({ id, packed }: { id: number, packed: boolean }) => {
-      const response = await apiRequest(`/api/packing-items/${id}`, {
+      return apiRequest(`/api/packing-items/${id}`, {
         method: 'PATCH',
         data: { packed }
       });
-      return response.json();
     },
     onSuccess: () => {
+      // Force refetch directly
       queryClient.invalidateQueries({ queryKey: ['/api/packing-lists', listId, 'items'] });
+      queryClient.refetchQueries({ queryKey: ['/api/packing-lists', listId, 'items'] });
     },
     onError: () => {
       toast({ 

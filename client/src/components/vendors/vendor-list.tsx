@@ -24,17 +24,21 @@ export default function VendorList() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   // Fetch vendors
-  const { data: vendors = [], isLoading } = useQuery({
+  const { data: vendors = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/vendors'],
   });
   
   // Delete vendor mutation
   const deleteVendorMutation = useMutation({
     mutationFn: async (vendorId: number) => {
-      await apiRequest('DELETE', `/api/vendors/${vendorId}`);
+      return apiRequest(`/api/vendors/${vendorId}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
+      // Force refetch directly
       queryClient.invalidateQueries({ queryKey: ['/api/vendors'] });
+      queryClient.refetchQueries({ queryKey: ['/api/vendors'] });
       toast({ title: "Vendor deleted", description: "Vendor has been deleted successfully" });
     },
     onError: () => {

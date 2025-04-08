@@ -39,7 +39,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { MoreVertical, Plus } from "lucide-react";
-import AddPaymentModal from "./add-payment-modal";
+import AddPaymentModal from "@/components/payment/add-payment-modal";
 
 interface Payment {
   id: number;
@@ -110,15 +110,30 @@ export default function PaymentList() {
       });
     },
     onSuccess: () => {
+      // Force refetch directly for all relevant queries
       queryClient.invalidateQueries({ queryKey: ["/api/payments"] });
+      queryClient.refetchQueries({ queryKey: ["/api/payments"] });
+      
+      // Also invalidate vendor specific payment queries
       vendors.forEach((vendor) => {
         queryClient.invalidateQueries({
           queryKey: [`/api/vendors/${vendor.id}/payments`],
         });
+        queryClient.refetchQueries({
+          queryKey: [`/api/vendors/${vendor.id}/payments`],
+        });
       });
+      
       toast({
         title: "Payment deleted",
         description: "The payment has been deleted.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Error",
+        description: "Failed to delete payment. Please try again.",
+        variant: "destructive",
       });
     },
   });

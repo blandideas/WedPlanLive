@@ -41,7 +41,9 @@ export default function TaskList() {
       });
     },
     onSuccess: () => {
+      // Force refetch directly
       queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
+      queryClient.refetchQueries({ queryKey: ['/api/tasks'] });
       toast({ title: "Task deleted", description: "Task has been deleted successfully" });
     },
     onError: () => {

@@ -24,17 +24,23 @@ export default function ExpenseList() {
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   // Fetch expenses
-  const { data: expenses = [], isLoading } = useQuery({
+  const { data: expenses = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/expenses'],
   });
   
   // Delete expense mutation
   const deleteExpenseMutation = useMutation({
     mutationFn: async (expenseId: number) => {
-      await apiRequest('DELETE', `/api/expenses/${expenseId}`);
+      return apiRequest(`/api/expenses/${expenseId}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
+      // Force refetch directly
       queryClient.invalidateQueries({ queryKey: ['/api/expenses'] });
+      queryClient.refetchQueries({ queryKey: ['/api/expenses'] });
+      // Also update budget view since it might show total expenses
+      queryClient.invalidateQueries({ queryKey: ['/api/budget'] });
       toast({ title: "Expense deleted", description: "Expense has been deleted successfully" });
     },
     onError: () => {
