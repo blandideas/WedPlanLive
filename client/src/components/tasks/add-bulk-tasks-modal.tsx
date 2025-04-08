@@ -80,8 +80,11 @@ export default function AddBulkTasksModal({ isOpen, onClose }: AddBulkTasksModal
         status: data.status,
       }));
       
-      const response = await apiRequest('POST', '/api/tasks/bulk', {
-        tasks: taskObjects,
+      const response = await apiRequest('/api/tasks/bulk', {
+        method: 'POST',
+        data: {
+          tasks: taskObjects
+        }
       });
       return response.json();
     },
@@ -91,7 +94,8 @@ export default function AddBulkTasksModal({ isOpen, onClose }: AddBulkTasksModal
       onClose();
       form.reset();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Error adding tasks:", error);
       toast({ 
         title: "Error", 
         description: "There was an error adding the tasks", 
