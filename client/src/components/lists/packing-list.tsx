@@ -17,14 +17,11 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import PackingItemList from "./packing-item-list";
-import AddPackingItemModal from "./add-packing-item-modal";
 import AddPackingListModal from "./add-packing-list-modal";
 
 export default function PackingList() {
   const { toast } = useToast();
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [isItemModalOpen, setIsItemModalOpen] = useState(false);
-  const [currentListId, setCurrentListId] = useState<number | null>(null);
   const [editingList, setEditingList] = useState<any>(null);
   const [expandedList, setExpandedList] = useState<string | null>(null);
   const [listToDelete, setListToDelete] = useState<number | null>(null);
@@ -78,11 +75,6 @@ export default function PackingList() {
       setIsDeleteDialogOpen(false);
       setListToDelete(null);
     }
-  };
-  
-  const handleAddItem = (listId: number) => {
-    setCurrentListId(listId);
-    setIsItemModalOpen(true);
   };
   
   // Auto-expand the first list if there's only one
@@ -159,15 +151,6 @@ export default function PackingList() {
                   {list.description && (
                     <p className="text-gray-600 mb-4">{list.description}</p>
                   )}
-                  <div className="mb-4">
-                    <Button 
-                      variant="outline" 
-                      onClick={() => handleAddItem(list.id)}
-                      className="flex items-center gap-1"
-                    >
-                      <Plus size={16} /> Add Item
-                    </Button>
-                  </div>
                   <PackingItemList listId={list.id} />
                 </div>
               </AccordionContent>
@@ -182,15 +165,6 @@ export default function PackingList() {
         onClose={() => setIsAddModalOpen(false)}
         list={editingList}
       />
-      
-      {/* Add Item Modal */}
-      {currentListId !== null && (
-        <AddPackingItemModal
-          isOpen={isItemModalOpen}
-          onClose={() => setIsItemModalOpen(false)}
-          listId={currentListId}
-        />
-      )}
       
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
