@@ -40,7 +40,7 @@ export default function Dashboard({ budget, tasks = [], expenses = [] }: Dashboa
               </div>
               <div className="flex justify-between">
                 <span className="text-sm text-gray-600">Remaining</span>
-                <span className={`font-medium ${remainingAmount >= 0 ? 'text-success' : 'text-danger'}`}>
+                <span className={`font-medium ${remainingAmount >= 0 ? 'text-success' : 'text-destructive'}`}>
                   {formatCurrency(remainingAmount)}
                 </span>
               </div>
@@ -48,7 +48,7 @@ export default function Dashboard({ budget, tasks = [], expenses = [] }: Dashboa
             
             <div className="w-full bg-gray-200 rounded-full h-2 mb-1">
               <div 
-                className="bg-primary h-2 rounded-full" 
+                className={`h-2 rounded-full ${budgetUsedPercentage > 100 ? 'bg-destructive' : 'bg-primary'}`}
                 style={{ width: `${Math.min(100, budgetUsedPercentage)}%` }}
               ></div>
             </div>

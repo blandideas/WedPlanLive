@@ -41,7 +41,11 @@ export default function BudgetDetail({ budget, expenses = [] }: BudgetDetailProp
           </div>
         </div>
         
-        <Progress value={budgetUsedPercentage} className="h-3 mb-2" indicatorClassName="bg-primary" />
+        <Progress 
+          value={Math.min(100, budgetUsedPercentage)} 
+          className="h-3 mb-2" 
+          indicatorClassName={budgetUsedPercentage > 100 ? "bg-destructive" : "bg-primary"} 
+        />
         <div className="text-sm text-right text-gray-500 mb-4">
           {budgetUsedPercentage}% of budget used ({formatCurrency(spentAmount)} of {formatCurrency(totalBudget)})
         </div>
