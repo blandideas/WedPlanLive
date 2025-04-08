@@ -4,6 +4,9 @@ import { queryClient } from "@/lib/queryClient";
 import { apiRequest } from "@/lib/queryClient";
 import { getPriorityColor, getStatusColor, formatDate } from "@/lib/utils";
 import AddTaskModal from "./add-task-modal";
+import AddBulkTasksModal from "./add-bulk-tasks-modal";
+import { Button } from "@/components/ui/button";
+import { PlusIcon, ListPlus } from "lucide-react";
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -20,11 +23,13 @@ export default function TaskList() {
   const { toast } = useToast();
   const [editingTask, setEditingTask] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [isBulkAddModalOpen, setIsBulkAddModalOpen] = useState(false);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [taskToDelete, setTaskToDelete] = useState<number | null>(null);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   
   // Fetch tasks
-  const { data: tasks = [], isLoading } = useQuery({
+  const { data: tasks = [], isLoading } = useQuery<any[]>({
     queryKey: ['/api/tasks'],
   });
   
@@ -66,6 +71,27 @@ export default function TaskList() {
   
   return (
     <>
+      <div className="flex justify-between items-center mb-4">
+        <h2 className="text-xl font-semibold">Wedding Tasks</h2>
+        <div className="flex space-x-2">
+          <Button 
+            variant="outline"
+            onClick={() => setIsBulkAddModalOpen(true)}
+            className="flex items-center"
+          >
+            <ListPlus className="mr-2 h-4 w-4" />
+            Add Multiple Tasks
+          </Button>
+          <Button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center"
+          >
+            <PlusIcon className="mr-2 h-4 w-4" />
+            Add Task
+          </Button>
+        </div>
+      </div>
+      
       <div className="bg-white rounded-lg shadow overflow-hidden">
         {isLoading ? (
           <div className="p-8 text-center">Loading tasks...</div>
@@ -134,6 +160,18 @@ export default function TaskList() {
           task={editingTask}
         />
       )}
+      
+      {/* Add Task Modal */}
+      <AddTaskModal 
+        isOpen={isAddModalOpen} 
+        onClose={() => setIsAddModalOpen(false)} 
+      />
+      
+      {/* Bulk Add Tasks Modal */}
+      <AddBulkTasksModal 
+        isOpen={isBulkAddModalOpen} 
+        onClose={() => setIsBulkAddModalOpen(false)} 
+      />
       
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
