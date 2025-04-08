@@ -60,10 +60,16 @@ export default function AddPackingItemModal({ isOpen, onClose, listId, item }: A
       };
       
       if (isEditing) {
-        const response = await apiRequest('PATCH', `/api/packing-items/${item.id}`, payload);
+        const response = await apiRequest(`/api/packing-items/${item.id}`, {
+          method: 'PATCH',
+          data: payload
+        });
         return response.json();
       } else {
-        const response = await apiRequest('POST', '/api/packing-items', payload);
+        const response = await apiRequest('/api/packing-items', {
+          method: 'POST',
+          data: payload
+        });
         return response.json();
       }
     },

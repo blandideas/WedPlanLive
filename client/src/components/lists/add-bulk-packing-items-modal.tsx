@@ -63,7 +63,10 @@ export default function AddBulkPackingItemsModal({ isOpen, onClose, listId }: Ad
       }));
 
       // Make the API call to add all items
-      const response = await apiRequest('POST', '/api/packing-items/bulk', { items });
+      const response = await apiRequest('/api/packing-items/bulk', {
+        method: 'POST',
+        data: { items }
+      });
       return response.json();
     },
     onSuccess: (data) => {
