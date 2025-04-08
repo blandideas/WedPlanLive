@@ -84,7 +84,10 @@ export default function AddVendorModal({ isOpen, onClose, vendor }: AddVendorMod
   // Create vendor mutation
   const createVendorMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await apiRequest('POST', '/api/vendors', data);
+      const response = await apiRequest('/api/vendors', {
+        method: 'POST',
+        data: data
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -93,7 +96,8 @@ export default function AddVendorModal({ isOpen, onClose, vendor }: AddVendorMod
       onClose();
       form.reset();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Vendor creation error:", error);
       toast({ 
         title: "Error", 
         description: "There was an error adding the vendor", 
@@ -105,7 +109,10 @@ export default function AddVendorModal({ isOpen, onClose, vendor }: AddVendorMod
   // Update vendor mutation
   const updateVendorMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await apiRequest('PATCH', `/api/vendors/${vendor.id}`, data);
+      const response = await apiRequest(`/api/vendors/${vendor.id}`, {
+        method: 'PATCH',
+        data: data
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -113,7 +120,8 @@ export default function AddVendorModal({ isOpen, onClose, vendor }: AddVendorMod
       toast({ title: "Success", description: "Vendor updated successfully" });
       onClose();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Vendor update error:", error);
       toast({ 
         title: "Error", 
         description: "There was an error updating the vendor", 

@@ -61,7 +61,10 @@ export default function SetBudgetModal({ isOpen, onClose }: SetBudgetModalProps)
   // Set budget mutation
   const setBudgetMutation = useMutation({
     mutationFn: async (data: { amount: number }) => {
-      const response = await apiRequest('POST', '/api/budget', data);
+      const response = await apiRequest('/api/budget', {
+        method: 'POST',
+        data: data
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -69,7 +72,8 @@ export default function SetBudgetModal({ isOpen, onClose }: SetBudgetModalProps)
       toast({ title: "Success", description: "Budget updated successfully" });
       onClose();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Budget update error:", error);
       toast({ 
         title: "Error", 
         description: "There was an error updating the budget", 

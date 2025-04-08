@@ -47,10 +47,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a task
   apiRouter.post("/tasks", async (req: Request, res: Response) => {
     try {
+      console.log("POST /tasks received:", req.body);
       const taskData = insertTaskSchema.parse(req.body);
+      console.log("Validated task data:", taskData);
       const newTask = await storage.createTask(taskData);
+      console.log("Created task:", newTask);
       res.status(201).json(newTask);
     } catch (error) {
+      console.error("Error creating task:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid task data", errors: error.errors });
       }
@@ -125,10 +129,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Create a vendor
   apiRouter.post("/vendors", async (req: Request, res: Response) => {
     try {
+      console.log("POST /vendors received:", req.body);
       const vendorData = insertVendorSchema.parse(req.body);
+      console.log("Validated vendor data:", vendorData);
       const newVendor = await storage.createVendor(vendorData);
+      console.log("Created vendor:", newVendor);
       res.status(201).json(newVendor);
     } catch (error) {
+      console.error("Error creating vendor:", error);
       if (error instanceof z.ZodError) {
         return res.status(400).json({ message: "Invalid vendor data", errors: error.errors });
       }

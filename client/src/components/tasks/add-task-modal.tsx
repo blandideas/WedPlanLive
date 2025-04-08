@@ -80,7 +80,10 @@ export default function AddTaskModal({ isOpen, onClose, task }: AddTaskModalProp
   // Create task mutation
   const createTaskMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await apiRequest('POST', '/api/tasks', data);
+      const response = await apiRequest('/api/tasks', {
+        method: 'POST',
+        data: data
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -89,7 +92,8 @@ export default function AddTaskModal({ isOpen, onClose, task }: AddTaskModalProp
       onClose();
       form.reset();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Task creation error:", error);
       toast({ 
         title: "Error", 
         description: "There was an error creating the task", 
@@ -101,7 +105,10 @@ export default function AddTaskModal({ isOpen, onClose, task }: AddTaskModalProp
   // Update task mutation
   const updateTaskMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await apiRequest('PATCH', `/api/tasks/${task.id}`, data);
+      const response = await apiRequest(`/api/tasks/${task.id}`, {
+        method: 'PATCH',
+        data: data
+      });
       return response.json();
     },
     onSuccess: () => {
@@ -109,7 +116,8 @@ export default function AddTaskModal({ isOpen, onClose, task }: AddTaskModalProp
       toast({ title: "Success", description: "Task updated successfully" });
       onClose();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Task update error:", error);
       toast({ 
         title: "Error", 
         description: "There was an error updating the task", 

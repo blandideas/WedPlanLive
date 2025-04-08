@@ -88,9 +88,12 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
   // Create expense mutation
   const createExpenseMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await apiRequest('POST', '/api/expenses', {
-        ...data,
-        vendor: data.vendor === 'none' ? null : data.vendor,
+      const response = await apiRequest('/api/expenses', {
+        method: 'POST',
+        data: {
+          ...data,
+          vendor: data.vendor === 'none' ? null : data.vendor,
+        }
       });
       return response.json();
     },
@@ -100,7 +103,8 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
       onClose();
       form.reset();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Expense creation error:", error);
       toast({ 
         title: "Error", 
         description: "There was an error adding the expense", 
@@ -112,9 +116,12 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
   // Update expense mutation
   const updateExpenseMutation = useMutation({
     mutationFn: async (data: z.infer<typeof formSchema>) => {
-      const response = await apiRequest('PATCH', `/api/expenses/${expense.id}`, {
-        ...data,
-        vendor: data.vendor === 'none' ? null : data.vendor,
+      const response = await apiRequest(`/api/expenses/${expense.id}`, {
+        method: 'PATCH',
+        data: {
+          ...data,
+          vendor: data.vendor === 'none' ? null : data.vendor,
+        }
       });
       return response.json();
     },
@@ -123,7 +130,8 @@ export default function AddExpenseModal({ isOpen, onClose, expense }: AddExpense
       toast({ title: "Success", description: "Expense updated successfully" });
       onClose();
     },
-    onError: () => {
+    onError: (error) => {
+      console.error("Expense update error:", error);
       toast({ 
         title: "Error", 
         description: "There was an error updating the expense", 
