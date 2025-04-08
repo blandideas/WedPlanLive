@@ -25,33 +25,35 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+// Form schema for budget
 const formSchema = z.object({
   amount: z.string()
     .min(1, { message: "Budget amount is required" })
-    .transform((val) => Number(val))
-    .refine((val) => !isNaN(val) && val > 0, { message: "Budget must be a positive number" }),
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, { message: "Budget must be a positive number" })
 });
+
+type FormValues = z.infer<typeof formSchema>;
 
 interface SetBudgetModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
+// Define budget type
+interface Budget {
+  id: number;
+  amount: number;
+}
+
 export default function SetBudgetModal({ isOpen, onClose }: SetBudgetModalProps) {
   const { toast } = useToast();
-  
-  // Define budget type
-  interface Budget {
-    id: number;
-    amount: number;
-  }
   
   // Fetch current budget
   const { data: budget } = useQuery<Budget>({
     queryKey: ['/api/budget'],
   });
   
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       amount: budget?.amount ? budget.amount.toString() : "0",
@@ -88,8 +90,10 @@ export default function SetBudgetModal({ isOpen, onClose }: SetBudgetModalProps)
     }
   });
   
-  const onSubmit = (data: z.infer<typeof formSchema>) => {
-    setBudgetMutation.mutate({ amount: data.amount });
+  const onSubmit = (formData: FormValues) => {
+    // Convert string to number
+    const amountAsNumber = parseFloat(formData.amount);
+    setBudgetMutation.mutate({ amount: amountAsNumber });
   };
   
   return (
@@ -112,13 +116,13 @@ export default function SetBudgetModal({ isOpen, onClose }: SetBudgetModalProps)
                   <FormLabel>Total Budget Amount</FormLabel>
                   <div className="relative">
                     <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                      <span className="text-gray-500 sm:text-sm">$</span>
+                      <span className="text-gray-500 sm:text-sm">GHS</span>
                     </div>
                     <FormControl>
                       <Input 
                         type="number" 
                         placeholder="0.00" 
-                        className="pl-7" 
+                        className="pl-12" 
                         min="0" 
                         step="0.01" 
                         {...field} 

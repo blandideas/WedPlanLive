@@ -36,7 +36,9 @@ export default function TaskList() {
   // Delete task mutation
   const deleteTaskMutation = useMutation({
     mutationFn: async (taskId: number) => {
-      await apiRequest('DELETE', `/api/tasks/${taskId}`);
+      return apiRequest(`/api/tasks/${taskId}`, {
+        method: 'DELETE'
+      });
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/api/tasks'] });
