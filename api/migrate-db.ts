@@ -1,36 +1,17 @@
-import type { Request, Response } from 'express';
+// Migration script that runs automatically during build
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as schema from '../shared/schema';
 
-export default async function handler(
-  request: Request,
-  response: Response
-) {
+export async function runMigration() {
   try {
-    console.log('Starting database initialization...');
-    
-    if (request.method !== 'POST') {
-      return response.status(405).json({ 
-        error: 'Method not allowed - use POST to trigger database initialization' 
-      });
-    }
-    
-    // Basic auth check - should be improved for production
-    const authHeader = request.headers.authorization;
-    // Allow without auth if no secret is set, but recommend setting one
-    if (process.env.DB_PUSH_SECRET && (!authHeader || authHeader !== `Bearer ${process.env.DB_PUSH_SECRET}`)) {
-      return response.status(401).json({ 
-        error: 'Unauthorized. Set DB_PUSH_SECRET in environment variables and use it in the Authorization header.' 
-      });
-    }
+    console.log('Starting automatic database migration...');
     
     // Get the database URL
     const dbUrl = process.env.DATABASE_URL;
     if (!dbUrl) {
-      return response.status(500).json({ 
-        error: 'DATABASE_URL environment variable is not set' 
-      });
+      console.error('DATABASE_URL environment variable is not set, cannot run migration');
+      return false;
     }
     
     // Create the database connection
@@ -124,17 +105,29 @@ export default async function handler(
     `;
     
     console.log('Database tables created successfully!');
-    
-    return response.status(200).json({ 
-      success: true, 
-      message: 'Database tables created successfully!',
-      notes: 'The tables have been created according to your schema. You should now be able to use your application with full database functionality.'
-    });
+    return true;
   } catch (error) {
     console.error('Database initialization error:', error);
-    return response.status(500).json({ 
-      error: 'An error occurred during database initialization',
-      details: error instanceof Error ? error.message : String(error)
-    });
+    return false;
   }
 }
+
+// Run the migration if this file is executed directly
+if (require.main === module) {
+  runMigration()
+    .then(success => {
+      if (success) {
+        console.log('Migration completed successfully');
+        process.exit(0);
+      } else {
+        console.error('Migration failed');
+        process.exit(1);
+      }
+    })
+    .catch(err => {
+      console.error('Migration error:', err);
+      process.exit(1);
+    });
+}
+
+export default runMigration;

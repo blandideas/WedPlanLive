@@ -1,36 +1,18 @@
-import type { Request, Response } from 'express';
+// Database migration script for Vercel deployment
+// This script is called during the build process
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as schema from '../shared/schema';
 
-export default async function handler(
-  request: Request,
-  response: Response
-) {
+async function migrateDatabase() {
   try {
-    console.log('Starting database initialization...');
-    
-    if (request.method !== 'POST') {
-      return response.status(405).json({ 
-        error: 'Method not allowed - use POST to trigger database initialization' 
-      });
-    }
-    
-    // Basic auth check - should be improved for production
-    const authHeader = request.headers.authorization;
-    // Allow without auth if no secret is set, but recommend setting one
-    if (process.env.DB_PUSH_SECRET && (!authHeader || authHeader !== `Bearer ${process.env.DB_PUSH_SECRET}`)) {
-      return response.status(401).json({ 
-        error: 'Unauthorized. Set DB_PUSH_SECRET in environment variables and use it in the Authorization header.' 
-      });
-    }
+    console.log('Starting database migration...');
     
     // Get the database URL
     const dbUrl = process.env.DATABASE_URL;
     if (!dbUrl) {
-      return response.status(500).json({ 
-        error: 'DATABASE_URL environment variable is not set' 
-      });
+      console.error('DATABASE_URL environment variable is not set, cannot run migration');
+      process.exit(1);
     }
     
     // Create the database connection
@@ -124,17 +106,12 @@ export default async function handler(
     `;
     
     console.log('Database tables created successfully!');
-    
-    return response.status(200).json({ 
-      success: true, 
-      message: 'Database tables created successfully!',
-      notes: 'The tables have been created according to your schema. You should now be able to use your application with full database functionality.'
-    });
+    process.exit(0);
   } catch (error) {
     console.error('Database initialization error:', error);
-    return response.status(500).json({ 
-      error: 'An error occurred during database initialization',
-      details: error instanceof Error ? error.message : String(error)
-    });
+    process.exit(1);
   }
 }
+
+// Run the migration
+migrateDatabase();
