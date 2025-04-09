@@ -1,0 +1,46 @@
+[11:31:42.831] Cloning github.com/blandideas/WeddingPlanMaster (Branch: main, Commit: 2f58687)
+[11:31:42.848] Skipping build cache, deployment was triggered without cache.
+[11:31:43.292] Cloning completed: 455.000ms
+[11:31:43.498] Running build in Washington, D.C., USA (East) – iad1
+[11:31:43.645] Running "vercel build"
+[11:31:44.010] Vercel CLI 41.5.0
+[11:31:44.120] WARN! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+[11:31:44.744] Installing dependencies...
+[11:31:49.217] npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[11:31:49.240] npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[11:31:54.227] 
+[11:31:54.228] added 477 packages in 9s
+[11:31:54.228] 
+[11:31:54.228] 61 packages are looking for funding
+[11:31:54.228]   run `npm fund` for details
+[11:31:54.305] Running "npm run build"
+[11:31:54.417] 
+[11:31:54.417] > rest-express@1.0.0 build
+[11:31:54.417] > vite build && esbuild server/index.ts --platform=node --packages=external --bundle --format=esm --outdir=dist
+[11:31:54.418] 
+[11:31:54.789] [36mvite v5.4.14 [32mbuilding for production...[36m[39m
+[11:31:54.846] transforming...
+[11:31:55.121] Browserslist: browsers data (caniuse-lite) is 6 months old. Please run:
+[11:31:55.122]   npx update-browserslist-db@latest
+[11:31:55.123]   Why you should do it regularly: https://github.com/browserslist/update-db#readme
+[11:32:00.210] [32m✓[39m 2580 modules transformed.
+[11:32:00.647] rendering chunks...
+[11:32:00.664] computing gzip size...
+[11:32:00.681] [2m../dist/public/[22m[32mindex.html                 [39m[1m[2m  1.88 kB[22m[1m[22m[2m │ gzip:   0.79 kB[22m
+[11:32:00.682] [2m../dist/public/[22m[2massets/[22m[35mindex-D6Ml5jcV.css  [39m[1m[2m 60.93 kB[22m[1m[22m[2m │ gzip:  10.67 kB[22m
+[11:32:00.685] [2m../dist/public/[22m[2massets/[22m[36mindex-BubKoxdT.js   [39m[1m[33m565.14 kB[39m[22m[2m │ gzip: 168.69 kB[22m
+[11:32:00.686] [32m✓ built in 5.87s[39m
+[11:32:00.686] [33m
+[11:32:00.686] (!) Some chunks are larger than 500 kB after minification. Consider:
+[11:32:00.686] - Using dynamic import() to code-split the application
+[11:32:00.687] - Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+[11:32:00.687] - Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.[39m
+[11:32:00.722] 
+[11:32:00.723]   dist/index.js  31.6kb
+[11:32:00.723] 
+[11:32:00.723] ⚡ Done in 7ms
+[11:32:01.018] Using TypeScript 5.6.3 (local user-provided)
+[11:32:10.098] Build Completed in /vercel/output [25s]
+[11:32:10.210] Deploying outputs...
+[11:32:14.978] 
+[11:32:15.323] Deployment completed
