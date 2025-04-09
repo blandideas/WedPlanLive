@@ -1,35 +1,37 @@
 {
-  "buildCommand": "npm run db:push && npm run build",
-  "outputDirectory": "dist/public",
-  "functions": {
-    "api/*.ts": {
-      "memory": 1024,
-      "maxDuration": 10
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/*.js",
+      "use": "@vercel/node"
     },
-    "api/*.js": {
-      "memory": 1024,
-      "maxDuration": 10
+    {
+      "src": "package.json",
+      "use": "@vercel/static-build",
+      "config": {
+        "distDir": "dist/public"
+      }
     }
-  },
+  ],
   "routes": [
     {
-      "src": "/api/migrate",
-      "dest": "/api/migrate"
+      "src": "/api/db-status",
+      "dest": "/api/db-status.js"
     },
     {
-      "src": "/api/db-push",
-      "dest": "/api/db-push"
+      "src": "/api/simple-migrate",
+      "dest": "/api/simple-migrate.js"
     },
     {
       "src": "/api/(.*)",
-      "dest": "/api"
+      "dest": "/api/$1"
     },
     {
       "handle": "filesystem"
     },
     {
       "src": "/(.*)",
-      "dest": "/"
+      "dest": "/dist/public/$1"
     }
   ]
 }
