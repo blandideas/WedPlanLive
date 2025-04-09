@@ -1,25 +1,26 @@
-// api/migrate.js
-// This file is a simpler version of db-push.ts without TS type dependencies
-
+import type { VercelRequest, VercelResponse } from '@vercel/node';
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as schema from '../shared/schema';
 
-export default async function handler(req, res) {
+export default async function handler(
+  request: VercelRequest,
+  response: VercelResponse
+) {
   try {
     console.log('Starting database initialization...');
     
-    if (req.method !== 'POST') {
-      return res.status(405).json({ 
+    if (request.method !== 'POST') {
+      return response.status(405).json({ 
         error: 'Method not allowed - use POST to trigger database initialization' 
       });
     }
     
     // Basic auth check - should be improved for production
-    const authHeader = req.headers.authorization;
+    const authHeader = request.headers.authorization;
     // Allow without auth if no secret is set, but recommend setting one
     if (process.env.DB_PUSH_SECRET && (!authHeader || authHeader !== `Bearer ${process.env.DB_PUSH_SECRET}`)) {
-      return res.status(401).json({ 
+      return response.status(401).json({ 
         error: 'Unauthorized. Set DB_PUSH_SECRET in environment variables and use it in the Authorization header.' 
       });
     }
@@ -27,7 +28,7 @@ export default async function handler(req, res) {
     // Get the database URL
     const dbUrl = process.env.DATABASE_URL;
     if (!dbUrl) {
-      return res.status(500).json({ 
+      return response.status(500).json({ 
         error: 'DATABASE_URL environment variable is not set' 
       });
     }
@@ -124,14 +125,14 @@ export default async function handler(req, res) {
     
     console.log('Database tables created successfully!');
     
-    return res.status(200).json({ 
+    return response.status(200).json({ 
       success: true, 
       message: 'Database tables created successfully!',
       notes: 'The tables have been created according to your schema. You should now be able to use your application with full database functionality.'
     });
   } catch (error) {
     console.error('Database initialization error:', error);
-    return res.status(500).json({ 
+    return response.status(500).json({ 
       error: 'An error occurred during database initialization',
       details: error instanceof Error ? error.message : String(error)
     });
