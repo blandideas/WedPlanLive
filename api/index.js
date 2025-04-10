@@ -1,10 +1,9 @@
 // Vercel Serverless API
-import express from 'express';
-import { drizzle } from 'drizzle-orm/neon-http';
-import { neon } from '@neondatabase/serverless';
-import * as schema from '../shared/schema';
-import { IStorage } from '../server/storage';
-import { DatabaseStorage } from '../server/database-storage';
+const express = require('express');
+const { drizzle } = require('drizzle-orm/neon-http');
+const { neon } = require('@neondatabase/serverless');
+const schema = require('../shared/schema');
+const { DatabaseStorage } = require('../server/database-storage');
 
 // Create Express app
 const app = express();
@@ -460,4 +459,4 @@ app.use((err, _req, res, _next) => {
 });
 
 // Export for Vercel serverless
-export default app;
+module.exports = app;

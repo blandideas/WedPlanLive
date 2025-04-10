@@ -1,7 +1,7 @@
 // Simple DB status check endpoint that doesn't rely on complex imports
-import { neon } from '@neondatabase/serverless';
+const { neon } = require('@neondatabase/serverless');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   try {
     // Check if DATABASE_URL is set
     if (!process.env.DATABASE_URL) {
@@ -25,16 +25,18 @@ export default async function handler(req, res) {
         databaseUrl: process.env.DATABASE_URL.substring(0, 15) + "...",
         tables: tables.map(t => t.tablename)
       });
-    } catch (error) {
+    } catch (dbError) {
+      console.error('Database connection error:', dbError);
       return res.status(500).json({ 
         error: "Database connection failed", 
-        details: error.message 
+        details: dbError.message || String(dbError)
       });
     }
   } catch (error) {
+    console.error('General error:', error);
     return res.status(500).json({ 
       error: "Error checking database status",
-      details: error.message 
+      details: error.message || String(error)
     });
   }
 }

@@ -1,7 +1,7 @@
 // Simple migration endpoint with minimal dependencies
-import { neon } from '@neondatabase/serverless';
+const { neon } = require('@neondatabase/serverless');
 
-export default async function handler(req, res) {
+module.exports = async (req, res) => {
   // Only allow POST requests
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
@@ -32,6 +32,7 @@ export default async function handler(req, res) {
         password TEXT NOT NULL
       )
     `;
+    console.log('- Created users table');
     
     // Create tasks table
     await sql`
@@ -43,6 +44,7 @@ export default async function handler(req, res) {
         status TEXT NOT NULL
       )
     `;
+    console.log('- Created tasks table');
     
     // Create vendors table
     await sql`
@@ -55,6 +57,7 @@ export default async function handler(req, res) {
         email TEXT
       )
     `;
+    console.log('- Created vendors table');
     
     // Create budgets table
     await sql`
@@ -63,6 +66,7 @@ export default async function handler(req, res) {
         amount DOUBLE PRECISION NOT NULL
       )
     `;
+    console.log('- Created budgets table');
     
     // Create expenses table
     await sql`
@@ -74,6 +78,7 @@ export default async function handler(req, res) {
         amount DOUBLE PRECISION NOT NULL
       )
     `;
+    console.log('- Created expenses table');
     
     // Create packing_lists table
     await sql`
@@ -83,6 +88,7 @@ export default async function handler(req, res) {
         description TEXT
       )
     `;
+    console.log('- Created packing_lists table');
     
     // Create packing_items table
     await sql`
@@ -94,6 +100,7 @@ export default async function handler(req, res) {
         packed BOOLEAN NOT NULL DEFAULT false
       )
     `;
+    console.log('- Created packing_items table');
     
     // Create payments table
     await sql`
@@ -106,18 +113,21 @@ export default async function handler(req, res) {
         is_paid BOOLEAN NOT NULL DEFAULT false
       )
     `;
+    console.log('- Created payments table');
     
     console.log('Database tables created successfully!');
     
     return res.status(200).json({ 
       success: true, 
-      message: 'Database tables created successfully!'
+      message: 'Database tables created successfully!',
+      tables: ['users', 'tasks', 'vendors', 'budgets', 'expenses', 'packing_lists', 'packing_items', 'payments']
     });
   } catch (error) {
     console.error('Database initialization error:', error);
     return res.status(500).json({ 
       error: 'An error occurred during database initialization',
-      details: error instanceof Error ? error.message : String(error)
+      details: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined
     });
   }
 }
