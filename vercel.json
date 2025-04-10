@@ -23,6 +23,16 @@
       "dest": "/api/simple-migrate.js"
     },
     {
+      "src": "/api/tasks",
+      "methods": ["GET"],
+      "dest": "/api/getTasks.js"
+    },
+    {
+      "src": "/api/tasks",
+      "methods": ["POST"],
+      "dest": "/api/createTask.js"
+    },
+    {
       "src": "/api/(.*)",
       "dest": "/api/$1"
     },
