@@ -1,16 +1,6 @@
-// Production server startup script for Cloudways
-import path from 'path';
-import fs from 'fs';
-import { fileURLToPath } from 'url';
-import dotenv from 'dotenv';
-import { createRequire } from 'module';
-
-// Get current directory name in ES modules
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
-// Create require function
-const require = createRequire(import.meta.url);
+// Production server startup script for Cloudways (CommonJS version)
+const path = require('path');
+const fs = require('fs');
 
 // Set production environment
 process.env.NODE_ENV = 'production';
@@ -18,7 +8,7 @@ process.env.NODE_ENV = 'production';
 // Load environment variables from .env file if present
 try {
   if (fs.existsSync(path.join(__dirname, '.env'))) {
-    dotenv.config();
+    require('dotenv').config();
     console.log('Loaded environment variables from .env file');
   }
 } catch (error) {
@@ -27,6 +17,13 @@ try {
 
 // Function to determine if we should use TypeScript or JavaScript server file
 function determineServerEntrypoint() {
+  // Check for CJS version first
+  const cjsPath = path.join(__dirname, 'server/index.cjs');
+  if (fs.existsSync(cjsPath)) {
+    console.log('Using CommonJS server: server/index.cjs');
+    return cjsPath;
+  }
+  
   // Check if compiled JS file exists in dist-server directory
   const compiledPath = path.join(__dirname, 'dist-server/index.js');
   if (fs.existsSync(compiledPath)) {
@@ -49,17 +46,9 @@ function determineServerEntrypoint() {
 console.log('Starting wedding planner application in production mode...');
 const serverEntrypoint = determineServerEntrypoint();
 
-// We need to use dynamic import for ES modules
-import(serverEntrypoint)
-  .catch(err => {
-    console.error('Failed to start server:', err);
-    
-    // If ES modules import fails, try CommonJS require as fallback
-    try {
-      console.log('Trying CommonJS require as fallback...');
-      require(serverEntrypoint);
-    } catch (requireErr) {
-      console.error('Both ES modules and CommonJS loading failed:', requireErr);
-      process.exit(1);
-    }
-  });
+try {
+  require(serverEntrypoint);
+} catch (error) {
+  console.error('Failed to start server:', error);
+  process.exit(1);
+}

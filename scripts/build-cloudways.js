@@ -1,7 +1,12 @@
 // Production build script for Cloudways
-const { execSync } = require('child_process');
-const path = require('path');
-const fs = require('fs');
+import { execSync } from 'child_process';
+import path from 'path';
+import fs from 'fs';
+import { fileURLToPath } from 'url';
+
+// Get current directory name in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 // Create necessary directories
 const createDirIfNotExists = (dir) => {
@@ -34,6 +39,28 @@ try {
     path.join(__dirname, '../.env.example'), 
     path.join(__dirname, '../dist/.env.example')
   );
+  
+  // Also copy our custom CommonJS files for deployment
+  console.log('Copying CommonJS server files for Cloudways...');
+  
+  const serverFiles = [
+    'server/routes.js',
+    'server/database-storage.js',
+    'server/db.js',
+    'shared/schema.js'
+  ];
+  
+  serverFiles.forEach(file => {
+    const source = path.join(__dirname, '..', file);
+    const destination = path.join(__dirname, '../dist-server', path.basename(file));
+    
+    if (fs.existsSync(source)) {
+      fs.copyFileSync(source, destination);
+      console.log(`Copied ${file} to dist-server`);
+    } else {
+      console.warn(`Warning: Could not find ${file}`);
+    }
+  });
   
   console.log('Build completed successfully! Deploy the contents of both dist and dist-server directories.');
 } catch (error) {

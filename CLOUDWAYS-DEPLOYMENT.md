@@ -80,9 +80,11 @@ This guide walks you through the process of deploying the Wedding Planner applic
 3. Install Node.js (version 18+ recommended)
 4. Add the following to "Start Command":
    ```
-   cd public_html && node start.js
+   cd public_html && node start.cjs
    ```
 5. Click "Save Changes"
+
+> **Note**: We're using the CommonJS version (start.cjs) of the startup script since it's more compatible with various Node.js environments. The ES modules version (start.js) is also available if needed.
 
 ### 6. Run Database Migrations
 
@@ -97,7 +99,37 @@ This guide walks you through the process of deploying the Wedding Planner applic
    npm run db:push
    ```
 
-### 7. Configure Apache
+### 7. Manual Build Process (Alternative)
+
+If you encounter issues with the ES Modules vs CommonJS compatibility, you can use this alternative manual build process:
+
+1. SSH into your Cloudways server
+2. Navigate to your application directory:
+   ```
+   cd applications/YOUR_APP_NAME/public_html
+   ```
+3. Install dependencies:
+   ```
+   npm install
+   ```
+4. Build the frontend manually:
+   ```
+   npx vite build
+   ```
+5. Create server directory:
+   ```
+   mkdir -p dist-server
+   ```
+6. Copy server files:
+   ```
+   cp server/index.cjs dist-server/
+   cp server/routes.js dist-server/
+   cp server/database-storage.js dist-server/
+   cp server/db.js dist-server/
+   cp shared/schema.js dist-server/
+   ```
+
+### 8. Configure Apache
 
 1. Make sure the `.htaccess` file is present in your application's public_html directory
 2. In your Cloudways dashboard, go to your application
@@ -105,7 +137,7 @@ This guide walks you through the process of deploying the Wedding Planner applic
 4. Make sure "AllowOverride All" is enabled
 5. Restart Apache by clicking "Restart Apache"
 
-### 8. Start the Application
+### 9. Start the Application
 
 1. In your Cloudways dashboard, go to your server
 2. Navigate to "Packages" > "Node.js"
