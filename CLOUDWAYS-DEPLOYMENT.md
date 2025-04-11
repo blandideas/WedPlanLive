@@ -99,9 +99,9 @@ This guide walks you through the process of deploying the Wedding Planner applic
    npm run db:push
    ```
 
-### 7. Manual Build Process (Alternative)
+### 7. Using the Custom Build Scripts (Recommended)
 
-If you encounter issues with the ES Modules vs CommonJS compatibility, you can use this alternative manual build process:
+We've created custom build scripts that avoid module compatibility issues:
 
 1. SSH into your Cloudways server
 2. Navigate to your application directory:
@@ -112,15 +112,32 @@ If you encounter issues with the ES Modules vs CommonJS compatibility, you can u
    ```
    npm install
    ```
-4. Build the frontend manually:
+4. Run the CommonJS compatible build script:
    ```
-   npx vite build
+   node scripts/cloudways-custom-build.cjs
    ```
-5. Create server directory:
+5. This will create all the necessary files in the `dist` and `dist-server` directories without module system conflicts
+
+> **Note**: The custom build script bypasses problematic ES module features and creates a simplified deployment structure that works well with Cloudways. This avoids the `import.meta` and top-level await errors you might encounter with the standard build process.
+
+### 8. Manual Build Process (Alternative)
+
+If you encounter issues with both the standard and custom build scripts, you can use this alternative manual process:
+
+1. SSH into your Cloudways server
+2. Navigate to your application directory:
    ```
-   mkdir -p dist-server
+   cd applications/YOUR_APP_NAME/public_html
    ```
-6. Copy server files:
+3. Install dependencies:
+   ```
+   npm install
+   ```
+4. Manually create the necessary directories:
+   ```
+   mkdir -p dist/public dist-server
+   ```
+5. Copy server files:
    ```
    cp server/index.cjs dist-server/
    cp server/routes.js dist-server/
@@ -128,8 +145,17 @@ If you encounter issues with the ES Modules vs CommonJS compatibility, you can u
    cp server/db.js dist-server/
    cp shared/schema.js dist-server/
    ```
+6. Create a simple index.html file:
+   ```
+   echo '<!DOCTYPE html><html><head><title>Wedding Planner</title></head><body><div id="root"></div></body></html>' > dist/public/index.html
+   ```
+7. Copy startup files:
+   ```
+   cp start.cjs dist/
+   cp .env.example dist/
+   ```
 
-### 8. Configure Apache
+### 9. Configure Apache
 
 1. Make sure the `.htaccess` file is present in your application's public_html directory
 2. In your Cloudways dashboard, go to your application
@@ -137,7 +163,7 @@ If you encounter issues with the ES Modules vs CommonJS compatibility, you can u
 4. Make sure "AllowOverride All" is enabled
 5. Restart Apache by clicking "Restart Apache"
 
-### 9. Start the Application
+### 10. Start the Application
 
 1. In your Cloudways dashboard, go to your server
 2. Navigate to "Packages" > "Node.js"
@@ -163,6 +189,15 @@ If you encounter issues with the ES Modules vs CommonJS compatibility, you can u
 1. Make sure the `.htaccess` file is correctly configured
 2. Verify that Apache is correctly forwarding requests to your Node.js application
 3. Check that "AllowOverride All" is enabled in your Apache configuration
+
+### Module System Errors
+
+If you see errors like `"import.meta" is not available with the "cjs" output format` or `Top-level await is currently not supported with the "cjs" output format`:
+
+1. Use the CommonJS version of our custom build script (scripts/cloudways-custom-build.cjs)
+2. Avoid using the standard build process which tries to convert ES modules to CommonJS
+3. Make sure to run the application using the CommonJS entry point (start.cjs)
+4. If you make manual code changes, avoid using ES module features like import.meta and top-level await
 
 ## Maintenance and Updates
 
