@@ -36,6 +36,41 @@ To run this application locally:
 
 5. The application will be available at `http://localhost:5000`
 
+## Deployment
+
+### Cloudways Deployment
+
+This application can be deployed to Cloudways. For detailed instructions, see [CLOUDWAYS-DEPLOYMENT.md](CLOUDWAYS-DEPLOYMENT.md).
+
+Quick start:
+
+1. Create a new PHP application on Cloudways
+2. Set up a PostgreSQL database
+3. Deploy the application code using Git or SFTP
+4. Configure environment variables in `.env`
+5. Set up Node.js in Cloudways server
+6. Start the application
+
+### Production Build
+
+To build the application for production:
+
+1. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+2. Build the frontend and server:
+   ```bash
+   node scripts/build-cloudways.js
+   ```
+
+3. Deploy the contents of the `dist` and `dist-server` directories
+4. Start the server using:
+   ```bash
+   node start.js
+   ```
+
 ## Database Schema
 
 The application uses the following data models:
@@ -47,6 +82,16 @@ The application uses the following data models:
 - Packing Lists: Lists for different events/activities 
 - Packing Items: Items within packing lists
 - Payments: Payments made to vendors
+
+## Migrating the Database
+
+To apply database migrations:
+
+```bash
+npm run db:push
+```
+
+This will create or update the database tables based on the schema defined in `shared/schema.ts`.
 
 ## Contributing
 
