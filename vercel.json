@@ -2,7 +2,11 @@
   "version": 2,
   "builds": [
     {
-      "src": "api/*.js",
+      "src": "api/all-in-one.js",
+      "use": "@vercel/node"
+    },
+    {
+      "src": "api/hello.js",
       "use": "@vercel/node"
     },
     {
@@ -17,10 +21,6 @@
     {
       "src": "/api/hello",
       "dest": "/api/hello.js"
-    },
-    {
-      "src": "/api/diagnostic",
-      "dest": "/api/diagnostic.js"
     },
     {
       "src": "/api/(.*)",
