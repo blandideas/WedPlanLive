@@ -6,21 +6,6 @@ const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
-// Add CORS headers for Vercel deployment
-app.use((req, res, next) => {
-  // Set CORS headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  
-  // Handle preflight requests
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  next();
-});
-
 // Request logging middleware
 app.use((req, res, next) => {
   const start = Date.now();
@@ -72,25 +57,19 @@ const registerRoutesAndStart = async () => {
     serveStatic(app);
   }
 
-  // Don't start the server if we're in a serverless environment (Vercel)
-  if (!process.env.VERCEL) {
-    // Start the server in development or non-Vercel environments
-    const port = process.env.PORT || 5000;
-    server.listen({
-      port,
-      host: "0.0.0.0",
-    }, () => {
-      log(`serving on port ${port}`);
-    });
-  }
+  // Start the server
+  const port = process.env.PORT || 5000;
+  server.listen({
+    port,
+    host: "0.0.0.0",
+  }, () => {
+    log(`serving on port ${port}`);
+  });
 
   return app;
 };
 
-// For local development, start the server
-if (!process.env.VERCEL) {
-  registerRoutesAndStart();
-}
+// Start the server
+registerRoutesAndStart();
 
-// Export the express app for Vercel
 export default app;

@@ -9,14 +9,12 @@ if (!connectionString) {
   console.error("DATABASE_URL environment variable is not set");
 }
 
-// For different environments
 let client: any;
 let db: any;
 
 try {
   console.log("Attempting to connect to database...");
   
-  // Regular postgres client for development
   client = postgres(connectionString, {
     prepare: false, // Disable prepared statements for better compatibility
     ssl: true, // Always enable SSL for database connections
@@ -36,5 +34,3 @@ try {
 }
 
 export { db };
-
-// For Vercel serverless environment, we use a special import in api/index.ts instead
