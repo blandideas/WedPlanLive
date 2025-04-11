@@ -19,7 +19,7 @@ try {
   // Regular postgres client for development
   client = postgres(connectionString, {
     prepare: false, // Disable prepared statements for better compatibility
-    ssl: process.env.NODE_ENV === 'production', // Enable SSL in production
+    ssl: true, // Always enable SSL for database connections
     onnotice: msg => console.log("DB notice:", msg),
     debug: (connection, query, params, types) => {
       if (process.env.NODE_ENV !== 'production') {
