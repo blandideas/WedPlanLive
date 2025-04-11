@@ -35,7 +35,15 @@ export class DatabaseStorage implements IStorage {
 
   // Task methods
   async getTasks(): Promise<Task[]> {
-    return await db.select().from(tasks);
+    try {
+      console.log("Fetching tasks from database");
+      const result = await db.select().from(tasks);
+      console.log(`Successfully fetched ${result.length} tasks`);
+      return result;
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+      throw new Error("Failed to fetch tasks");
+    }
   }
 
   async getTask(id: number): Promise<Task | undefined> {
@@ -114,8 +122,15 @@ export class DatabaseStorage implements IStorage {
 
   // Budget methods
   async getBudget(): Promise<Budget | undefined> {
-    const budgetList = await db.select().from(budgets);
-    return budgetList[0] || undefined;
+    try {
+      console.log("Fetching budget from database");
+      const budgetList = await db.select().from(budgets);
+      console.log(`Found ${budgetList.length} budget entries`);
+      return budgetList[0] || undefined;
+    } catch (error) {
+      console.error("Error fetching budget:", error);
+      throw new Error("Failed to fetch budget");
+    }
   }
 
   async setBudget(insertBudget: InsertBudget): Promise<Budget> {
@@ -146,7 +161,15 @@ export class DatabaseStorage implements IStorage {
 
   // Expense methods
   async getExpenses(): Promise<Expense[]> {
-    return await db.select().from(expenses);
+    try {
+      console.log("Fetching expenses from database");
+      const result = await db.select().from(expenses);
+      console.log(`Successfully fetched ${result.length} expenses`);
+      return result;
+    } catch (error) {
+      console.error("Error fetching expenses:", error);
+      throw new Error("Failed to fetch expenses");
+    }
   }
 
   async getExpense(id: number): Promise<Expense | undefined> {
