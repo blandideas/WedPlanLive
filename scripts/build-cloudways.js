@@ -20,17 +20,17 @@ const createDirIfNotExists = (dir) => {
 try {
   console.log('Starting Cloudways production build...');
   
-  // Build the frontend
+  // Build the frontend with ESM format
   console.log('Building frontend...');
-  execSync('npx vite build', { stdio: 'inherit' });
+  execSync('npx vite build --outDir dist --format es', { stdio: 'inherit' });
   
   // Create server output directory
   const serverOutputDir = path.join(__dirname, '../dist-server');
   createDirIfNotExists(serverOutputDir);
   
-  // Build server TypeScript files
+  // Build server TypeScript files with ESM format
   console.log('Building server...');
-  execSync(`npx esbuild server/**/*.ts --platform=node --packages=external --bundle --outdir=${serverOutputDir}`, 
+  execSync(`npx esbuild server/**/*.ts --platform=node --packages=external --bundle --format=esm --outdir=${serverOutputDir}`, 
     { stdio: 'inherit' });
   
   // Copy necessary files
