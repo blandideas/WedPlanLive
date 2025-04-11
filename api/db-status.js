@@ -1,42 +1,68 @@
-// Simple DB status check endpoint that doesn't rely on complex imports
-const { neon } = require('@neondatabase/serverless');
+// Database status check API for Vercel
+import { Pool } from 'pg';
 
-module.exports = async (req, res) => {
-  try {
-    // Check if DATABASE_URL is set
-    if (!process.env.DATABASE_URL) {
-      return res.status(500).json({ 
-        error: "DATABASE_URL is not set",
-        tables: [] 
-      });
+export default async function handler(req, res) {
+  const statusInfo = {
+    timestamp: new Date().toISOString(),
+    databaseCheck: {
+      database_url_provided: !!process.env.DATABASE_URL
     }
-    
-    // Check database connection with minimal dependencies
+  };
+
+  // Only attempt connection if DATABASE_URL is provided
+  if (process.env.DATABASE_URL) {
     try {
-      const sql = neon(process.env.DATABASE_URL);
-      const tables = await sql`
-        SELECT tablename 
-        FROM pg_catalog.pg_tables 
-        WHERE schemaname='public'
-      `;
+      console.log("Attempting database connection check...");
       
-      return res.status(200).json({
-        connected: true,
-        databaseUrl: process.env.DATABASE_URL.substring(0, 15) + "...",
-        tables: tables.map(t => t.tablename)
+      // Create database connection with SSL enabled
+      const pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: {
+          rejectUnauthorized: false // Less strict for testing
+        }
       });
-    } catch (dbError) {
-      console.error('Database connection error:', dbError);
-      return res.status(500).json({ 
-        error: "Database connection failed", 
-        details: dbError.message || String(dbError)
-      });
+
+      // Test connection
+      const client = await pool.connect();
+      console.log("Successfully connected to database");
+      
+      // Check if tables exist
+      const tableCheckQueries = [
+        { table: 'tasks', query: 'SELECT COUNT(*) FROM tasks' },
+        { table: 'budgets', query: 'SELECT COUNT(*) FROM budgets' },
+        { table: 'expenses', query: 'SELECT COUNT(*) FROM expenses' }
+      ];
+      
+      statusInfo.tables = {};
+      
+      for (const check of tableCheckQueries) {
+        try {
+          const result = await client.query(check.query);
+          statusInfo.tables[check.table] = {
+            exists: true,
+            count: parseInt(result.rows[0].count, 10)
+          };
+        } catch (tableError) {
+          console.error(`Error checking ${check.table} table:`, tableError.message);
+          statusInfo.tables[check.table] = {
+            exists: false,
+            error: tableError.message
+          };
+        }
+      }
+      
+      // Clean up
+      client.release();
+      await pool.end();
+      
+      statusInfo.databaseCheck.connected = true;
+      
+    } catch (error) {
+      console.error("Database connection error:", error.message);
+      statusInfo.databaseCheck.connected = false;
+      statusInfo.databaseCheck.error = error.message;
     }
-  } catch (error) {
-    console.error('General error:', error);
-    return res.status(500).json({ 
-      error: "Error checking database status",
-      details: error.message || String(error)
-    });
   }
+  
+  res.status(200).json(statusInfo);
 }
