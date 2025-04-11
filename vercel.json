@@ -23,46 +23,8 @@
       "dest": "/api/diagnostic.js"
     },
     {
-      "src": "/api/db-direct",
-      "dest": "/api/db-direct.js"
-    },
-    {
-      "src": "/api/vercel-db-setup",
-      "dest": "/api/vercel-db-setup.js"
-    },
-    {
-      "src": "/api/self-migrate",
-      "dest": "/api/self-migrate.js"
-    },
-    {
-      "src": "/api/info",
-      "dest": "/api/fix-index.js"
-    },
-    {
-      "src": "/api/tasks-direct",
-      "dest": "/api/fix-index.js"
-    },
-    {
-      "src": "/api/db-status",
-      "dest": "/api/db-status.js"
-    },
-    {
-      "src": "/api/simple-migrate",
-      "dest": "/api/simple-migrate.js"
-    },
-    {
-      "src": "/api/tasks",
-      "methods": ["GET"],
-      "dest": "/api/getTasks.js"
-    },
-    {
-      "src": "/api/tasks",
-      "methods": ["POST"],
-      "dest": "/api/createTask.js"
-    },
-    {
       "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "dest": "/api/all-in-one.js"
     },
     {
       "handle": "filesystem"
