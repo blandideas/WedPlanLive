@@ -27,6 +27,14 @@
       "dest": "/api/db-direct.js"
     },
     {
+      "src": "/api/vercel-db-setup",
+      "dest": "/api/vercel-db-setup.js"
+    },
+    {
+      "src": "/api/self-migrate",
+      "dest": "/api/self-migrate.js"
+    },
+    {
       "src": "/api/info",
       "dest": "/api/fix-index.js"
     },
