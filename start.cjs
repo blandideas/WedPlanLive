@@ -17,7 +17,14 @@ try {
 
 // Function to determine if we should use TypeScript or JavaScript server file
 function determineServerEntrypoint() {
-  // Check for CJS version first
+  // Check for bundled CJS version first (most reliable for Cloudways)
+  const bundledPath = path.join(__dirname, 'server/index-bundled.cjs');
+  if (fs.existsSync(bundledPath)) {
+    console.log('Using bundled CommonJS server (all-in-one): server/index-bundled.cjs');
+    return bundledPath;
+  }
+  
+  // Check for CJS version
   const cjsPath = path.join(__dirname, 'server/index.cjs');
   if (fs.existsSync(cjsPath)) {
     console.log('Using CommonJS server: server/index.cjs');

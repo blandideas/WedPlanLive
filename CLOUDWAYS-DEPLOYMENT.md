@@ -199,6 +199,20 @@ If you see errors like `"import.meta" is not available with the "cjs" output for
 3. Make sure to run the application using the CommonJS entry point (start.cjs)
 4. If you make manual code changes, avoid using ES module features like import.meta and top-level await
 
+### Routes Module Not Found Error
+
+If you encounter errors like `Failed to load routes module: Error: Routes module not found in any expected location`:
+
+1. Use the bundled server file which contains all dependencies in a single file:
+   ```
+   node server/index-bundled.cjs
+   ```
+   This file combines server, routes, and database logic in one file to avoid module resolution issues.
+
+2. If you prefer not using the bundled file, make sure all required files are in the correct locations relative to each other:
+   - The server directory should contain: index.cjs, routes.js, database-storage.js, db.js
+   - The shared directory should contain: schema.js
+
 ## Maintenance and Updates
 
 ### Updating the Application

@@ -41,6 +41,7 @@ try {
   const serverFiles = [
     'server/index.js',
     'server/index.cjs',
+    'server/index-bundled.cjs', // Include our new all-in-one bundled file
     'server/routes.js',
     'server/database-storage.js',
     'server/db.js',
