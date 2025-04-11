@@ -6,31 +6,65 @@ const fs = require('fs');
 // Try to load routes module - could be in different locations based on build
 let registerRoutes;
 try {
-  // First try looking in common locations
+  // Get the parent directory (where this file resides)
+  const currentDir = __dirname;
+  const parentDir = path.dirname(currentDir);
+  
+  // Build a more comprehensive list of possible locations
   const possibleLocations = [
+    // Current directory
+    path.join(currentDir, 'routes.js'),
+    
+    // Parent directory
+    path.join(parentDir, 'server/routes.js'),
+    
+    // Common build directories
+    path.join(parentDir, 'dist-server/routes.js'),
+    path.join(parentDir, 'dist/server/routes.js'),
+    
+    // Absolute paths
+    path.resolve(process.cwd(), 'server/routes.js'),
+    path.resolve(process.cwd(), 'routes.js'),
+    path.resolve(process.cwd(), 'dist-server/routes.js'),
+    
+    // Fallback to Node.js resolution
     './routes.js',
-    './dist-server/routes.js',
     './server/routes.js',
-    '../dist-server/routes.js',
+    '../server/routes.js',
   ];
   
+  // Log search locations for debugging
+  console.log('Searching for routes module in the following locations:');
+  possibleLocations.forEach(loc => console.log(' - ' + loc));
+  
   let routesFound = false;
+  let errorMessages = [];
   
   for (const location of possibleLocations) {
     try {
-      const routesModule = require(location);
-      if (routesModule && (routesModule.registerRoutes || routesModule.default?.registerRoutes)) {
-        registerRoutes = routesModule.registerRoutes || routesModule.default.registerRoutes;
-        console.log(`Found routes module at ${location}`);
-        routesFound = true;
-        break;
+      // Check if file exists before requiring
+      if (fs.existsSync(location)) {
+        console.log(`File exists at ${location}, attempting to require...`);
+        const routesModule = require(location);
+        
+        if (routesModule && (routesModule.registerRoutes || routesModule.default?.registerRoutes)) {
+          registerRoutes = routesModule.registerRoutes || routesModule.default.registerRoutes;
+          console.log(`✅ Successfully loaded routes module from ${location}`);
+          routesFound = true;
+          break;
+        } else {
+          console.log(`File at ${location} exists but doesn't export registerRoutes function`);
+        }
       }
     } catch (e) {
+      errorMessages.push(`Error loading ${location}: ${e.message}`);
       // Continue trying other locations
     }
   }
   
   if (!routesFound) {
+    console.error('Failed to find routes module. Errors encountered:');
+    errorMessages.forEach(msg => console.error(` - ${msg}`));
     throw new Error('Routes module not found in any expected location');
   }
 } catch (error) {
