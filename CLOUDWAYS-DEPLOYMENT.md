@@ -2,6 +2,17 @@
 
 This guide walks you through the process of deploying the Wedding Planner application to Cloudways.
 
+## Quick Start (Git Deployment)
+
+1. Create a Cloudways application (Custom App type)
+2. Set up a PostgreSQL database and note the credentials
+3. Connect your GitHub repository: https://github.com/blandideas/WeddingPlannerCL
+4. **Important**: Set up a Deployment Hook: `chmod +x cloudways-deploy.cjs && node cloudways-deploy.cjs`
+5. Click "Pull" to deploy
+6. Set Node.js start command to: `cd public_html && node app.js`
+
+That's it! The deployment hook handles everything else automatically.
+
 ## Prerequisites
 
 1. A Cloudways account
@@ -35,7 +46,7 @@ This guide walks you through the process of deploying the Wedding Planner applic
 
 ### 3. Deploy Application Code
 
-#### Option 1: Using Git
+#### Option 1: Using Git (Recommended)
 
 1. In your Cloudways dashboard, go to your application
 2. Navigate to "Application Settings" > "Git"
@@ -44,6 +55,12 @@ This guide walks you through the process of deploying the Wedding Planner applic
 5. Set branch to `main`
 6. Add your GitHub credentials if the repository is private
 7. Click "Save Changes" and then "Deploy"
+8. **Important**: Set up a Deployment Hook (in Application Settings > Deployment Hooks):
+   ```
+   chmod +x cloudways-deploy.cjs && node cloudways-deploy.cjs
+   ```
+   - This automated script handles the build process and application setup
+   - It should run on "Application Startup" hook
 
 #### Option 2: Manual Deployment
 
@@ -80,11 +97,11 @@ This guide walks you through the process of deploying the Wedding Planner applic
 3. Install Node.js (version 18+ recommended)
 4. Add the following to "Start Command":
    ```
-   cd public_html && node start.cjs
+   cd public_html && node app.js
    ```
 5. Click "Save Changes"
 
-> **Note**: We're using the CommonJS version (start.cjs) of the startup script since it's more compatible with various Node.js environments. The ES modules version (start.js) is also available if needed.
+> **Note**: The `app.js` file will be created automatically by the deployment hook and will use our bundled server file (index-bundled.cjs), which contains all necessary code in a single file for Cloudways compatibility.
 
 ### 6. Run Database Migrations
 
@@ -217,10 +234,20 @@ If you encounter errors like `Failed to load routes module: Error: Routes module
 
 ### Updating the Application
 
+When using the recommended Git deployment method with our deployment hook:
+
 1. Push changes to your GitHub repository
-2. If using Git deployment, click "Pull" in your Cloudways dashboard
-3. If using manual deployment, rebuild locally and upload the new files
-4. Restart the Node.js process
+2. Click "Pull" in your Cloudways dashboard
+3. The deployment hook will automatically:
+   - Set up the necessary environment
+   - Use the bundled server file
+   - Create the app.js runner
+4. No manual build steps required
+
+If using manual deployment:
+1. Rebuild locally using `node scripts/cloudways-custom-build.cjs`
+2. Upload the new files via SFTP
+3. Restart the Node.js process
 
 ### Monitoring
 
