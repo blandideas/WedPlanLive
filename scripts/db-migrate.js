@@ -1,5 +1,5 @@
-// Database migration script for Vercel deployment
-// This script is called during the build process
+// Database migration script
+// This script is used to create database tables
 import { drizzle } from 'drizzle-orm/neon-http';
 import { neon } from '@neondatabase/serverless';
 import * as schema from '../shared/schema';

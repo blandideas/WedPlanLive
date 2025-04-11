@@ -1,4 +1,4 @@
-// Migrate database script for Vercel deployments
+// Migrate database script for deployments
 const { execSync } = require('child_process');
 
 // Log with timestamp
