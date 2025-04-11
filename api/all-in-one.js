@@ -1,7 +1,7 @@
 // All-in-one API implementation specifically for Vercel deployment
 // This file contains all API endpoints in a single file with minimal dependencies
-const express = require('express');
-const { neon, neonConfig } = require('@neondatabase/serverless');
+import express from 'express';
+import { neon, neonConfig } from '@neondatabase/serverless';
 
 // Configure Neon for better performance in serverless
 neonConfig.fetchConnectionCache = true;
@@ -280,7 +280,7 @@ async function ensureTables() {
 }
 
 // Main request handler for all API routes
-module.exports = async (req, res) => {
+export default async (req, res) => {
   // Enable CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
