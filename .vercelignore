@@ -1,2 +1,2 @@
 api/*
-!api/all-in-one.js
+!api/vercel-api.js
