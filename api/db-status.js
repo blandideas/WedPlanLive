@@ -1,4 +1,4 @@
-// Database status check API for Vercel
+// Database status check API
 import { Pool } from 'pg';
 
 export default async function handler(req, res) {

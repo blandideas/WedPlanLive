@@ -1,4 +1,4 @@
-// Simple diagnostic API to test Vercel deployment
+// Simple diagnostic API to test database connection
 import { Pool } from 'pg';
 
 export default async function handler(req, res) {

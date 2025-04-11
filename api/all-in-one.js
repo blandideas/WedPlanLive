@@ -1,4 +1,4 @@
-// All-in-one API implementation specifically for Vercel deployment
+// All-in-one API implementation for alternative deployment
 // This file contains all API endpoints in a single file with minimal dependencies
 import express from 'express';
 import { neon, neonConfig } from '@neondatabase/serverless';
