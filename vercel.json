@@ -15,8 +15,24 @@
   ],
   "routes": [
     {
+      "src": "/api/hello",
+      "dest": "/api/hello.js"
+    },
+    {
       "src": "/api/diagnostic",
       "dest": "/api/diagnostic.js"
+    },
+    {
+      "src": "/api/db-direct",
+      "dest": "/api/db-direct.js"
+    },
+    {
+      "src": "/api/info",
+      "dest": "/api/fix-index.js"
+    },
+    {
+      "src": "/api/tasks-direct",
+      "dest": "/api/fix-index.js"
     },
     {
       "src": "/api/db-status",
