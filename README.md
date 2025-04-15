@@ -38,18 +38,16 @@ To run this application locally:
 
 ## Deployment
 
-### Cloudways Deployment
+### Replit Deployment
 
-This application can be deployed to Cloudways. For detailed instructions, see [CLOUDWAYS-DEPLOYMENT.md](CLOUDWAYS-DEPLOYMENT.md).
+This application can be deployed directly from Replit. 
 
 Quick start:
 
-1. Create a new PHP application on Cloudways
-2. Set up a PostgreSQL database
-3. Deploy the application code using Git or SFTP
-4. Configure environment variables in `.env`
-5. Set up Node.js in Cloudways server
-6. Start the application
+1. Make sure your application is running correctly in development mode
+2. Click the "Deploy" button in the Replit UI
+3. Follow the deployment wizard to configure your deployment
+4. Replit will handle building and hosting your application
 
 ### Production Build
 
@@ -62,13 +60,12 @@ To build the application for production:
 
 2. Build the frontend and server:
    ```bash
-   node scripts/build-cloudways.js
+   npm run build
    ```
 
-3. Deploy the contents of the `dist` and `dist-server` directories
-4. Start the server using:
+3. Start the server using:
    ```bash
-   node start.js
+   npm start
    ```
 
 ## Database Schema
