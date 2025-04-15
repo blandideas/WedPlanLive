@@ -1,4 +1,4 @@
-# Wedding Planner Application
+# WedPlanLive - Wedding Planning Platform
 
 A comprehensive wedding planning application that empowers couples to strategically manage their wedding preparation through intuitive digital tools.
 
@@ -20,7 +20,11 @@ A comprehensive wedding planning application that empowers couples to strategica
 
 To run this application locally:
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/blandideas/WedPlanLive.git
+   cd WedPlanLive
+   ```
 2. Install dependencies:
    ```bash
    npm install
@@ -40,14 +44,15 @@ To run this application locally:
 
 ### Replit Deployment
 
-This application can be deployed directly from Replit. 
+This application is deployed and hosted on Replit at: [WedPlanLive on Replit](https://wedplanlive.replit.app).
 
-Quick start:
+To deploy your own instance:
 
-1. Make sure your application is running correctly in development mode
-2. Click the "Deploy" button in the Replit UI
-3. Follow the deployment wizard to configure your deployment
-4. Replit will handle building and hosting your application
+1. Fork this repository to your Replit account
+2. Make sure your application is running correctly in development mode
+3. Click the "Deploy" button in the Replit UI
+4. Follow the deployment wizard to configure your deployment
+5. Replit will handle building and hosting your application
 
 ### Production Build
 
