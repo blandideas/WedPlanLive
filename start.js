@@ -1,4 +1,4 @@
-// Production server startup script for Cloudways
+// Production server startup script
 import path from 'path';
 import fs from 'fs';
 import { fileURLToPath } from 'url';
