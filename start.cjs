@@ -1,4 +1,4 @@
-// Production server startup script for Cloudways (CommonJS version)
+// Production server startup script (CommonJS version)
 const path = require('path');
 const fs = require('fs');
 
@@ -24,10 +24,10 @@ function determineServerEntrypoint() {
     return cjsPath;
   }
   
-  // Check if compiled JS file exists in dist-server directory
-  const compiledPath = path.join(__dirname, 'dist-server/index.js');
+  // Check if compiled JS file exists in dist directory
+  const compiledPath = path.join(__dirname, 'dist/index.js');
   if (fs.existsSync(compiledPath)) {
-    console.log('Using compiled server from dist-server directory');
+    console.log('Using compiled server from dist directory');
     return compiledPath;
   }
   

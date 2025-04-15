@@ -27,10 +27,10 @@ try {
 
 // Function to determine if we should use TypeScript or JavaScript server file
 function determineServerEntrypoint() {
-  // Check if compiled JS file exists in dist-server directory
-  const compiledPath = path.join(__dirname, 'dist-server/index.js');
+  // Check if compiled JS file exists in dist directory
+  const compiledPath = path.join(__dirname, 'dist/index.js');
   if (fs.existsSync(compiledPath)) {
-    console.log('Using compiled server from dist-server directory');
+    console.log('Using compiled server from dist directory');
     return compiledPath;
   }
   
